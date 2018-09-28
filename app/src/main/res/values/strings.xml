@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">CMClient</string>
+    <string name="edit_command">Type \"0\" for all commands.</string>
+    <string name="button_enter">Enter</string>
+    <string name="textview_message">CM messages</string>
+    <string name="server_address">Server IP address</string>
+    <string name="server_port">Server port number</string>
+    <string name="server_info_title">Server Information</string>
+    <string name="button_confirm">Confirm</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="login_ds_title">Login to default server</string>
+    <string name="login_id">Login ID</string>
+    <string name="login_passwd">Password</string>
+</resources>
