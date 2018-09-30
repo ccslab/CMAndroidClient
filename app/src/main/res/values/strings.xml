@@ -13,4 +13,6 @@
     <string name="login_passwd">Password</string>
     <string name="join_session_title">Join Session</string>
     <string name="session_name">Session Name</string>
+    <string name="change_group_title">Change Group</string>
+    <string name="group_name">Group Name</string>
 </resources>

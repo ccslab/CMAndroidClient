@@ -172,6 +172,9 @@ public class CMRunnable implements Runnable {
                 case "leaveSession":
                     leaveSession();
                     break;
+                case "changeGroup":
+                    changeGroup();
+                    break;
                 default:
                     Log.e("CMRunnable : run()", "menu ("+m_strMenu+") not defined!");
                     break;
@@ -318,6 +321,23 @@ public class CMRunnable implements Runnable {
             m_mainActivity.printMessage("successfully sent the leave-session request.\n");
         else
             m_mainActivity.printMessage("failed the leave-session request!\n");
+
+    }
+
+    private void changeGroup()
+    {
+        if(m_dialog == null)
+        {
+            m_mainActivity.printMessageln("Change-group dialog unavailable!");
+            return;
+        }
+
+        m_mainActivity.printMessage("====== change group\n");
+        EditText changeGroupNameEditText = m_dialog.getView().findViewById(R.id.changeGroupNameEditText);
+        String strGroupName = changeGroupNameEditText.getText().toString().trim();
+
+        if(strGroupName != null)
+            m_cmClientStub.changeGroup(strGroupName);
 
     }
 

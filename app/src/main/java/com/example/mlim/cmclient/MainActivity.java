@@ -15,7 +15,8 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements ServerInfoDialogFragment.ServerInfoDialogListener,
         LoginDSDialogFragment.LoginDSDialogListener,
-        JoinSessionDialogFragment.JoinSessionDialogListener
+        JoinSessionDialogFragment.JoinSessionDialogListener,
+        ChangeGroupDialogFragment.ChangeGroupDialogListener
 {
 
     private CMRunnable m_cmRunnable;
@@ -124,8 +125,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 leaveSession();
                 break;
             case "25": // change current group
-                printMessageln("Not supported yet!");
-                //changeGroup();
+                changeGroup();
                 break;
             case "26": // request session information from a designated server
                 printMessageln("Not supported yet!");
@@ -548,6 +548,24 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     {
         m_cmRunnable.setMenu("leaveSession");
         wakeUpCMRunnable();
+    }
+
+    private void changeGroup()
+    {
+        DialogFragment dialog = new ChangeGroupDialogFragment();
+        dialog.show(getFragmentManager(), "ChangeGroupDialogFragment");
+    }
+
+    public void onChangeGroupDialogConfirmClick(DialogFragment dialog)
+    {
+        m_cmRunnable.setMenu("changeGroup");
+        m_cmRunnable.setDialog(dialog);
+        wakeUpCMRunnable();
+    }
+
+    public void onChangeGroupDialogCancelClick(DialogFragment dialog)
+    {
+        // nothing to do
     }
 
 }
