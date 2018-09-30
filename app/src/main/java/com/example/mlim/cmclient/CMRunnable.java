@@ -166,6 +166,9 @@ public class CMRunnable implements Runnable {
                 case "requestSessionInfoDS":
                     requestSessionInfoDS();
                     break;
+                case "joinSession":
+                    joinSession();
+                    break;
                 default:
                     Log.e("CMRunnable : run()", "menu ("+m_strMenu+") not defined!");
                     break;
@@ -272,8 +275,34 @@ public class CMRunnable implements Runnable {
             m_mainActivity.printMessage("successfully sent the session-info request.\n");
         }
         else
+        {
             m_mainActivity.printMessage("failed the session-info request!\n");
+        }
         m_mainActivity.printMessage("======\n");
+
+    }
+
+    private void joinSession()
+    {
+        m_mainActivity.printMessage("====== join a session\n");
+        if(m_dialog == null)
+        {
+            m_mainActivity.printMessageln("Join-session dialog unavailable!");
+            return;
+        }
+
+        EditText sessionNameEditText = m_dialog.getView().findViewById(R.id.joinSessionNameEditText);
+        String strSessionName = sessionNameEditText.getText().toString().trim();
+        boolean bRequestResult = m_cmClientStub.joinSession(strSessionName);
+
+        if(bRequestResult)
+        {
+            m_mainActivity.printMessage("successfully sent the session-join request.\n");
+        }
+        else
+        {
+            m_mainActivity.printMessage("failed the session-join request!\n");
+        }
 
     }
 

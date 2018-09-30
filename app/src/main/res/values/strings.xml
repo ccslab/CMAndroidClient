@@ -11,4 +11,6 @@
     <string name="login_ds_title">Login to default server</string>
     <string name="login_id">Login ID</string>
     <string name="login_passwd">Password</string>
+    <string name="join_session_title">Join Session</string>
+    <string name="session_name">Session Name</string>
 </resources>

@@ -13,7 +13,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements ServerInfoDialogFragment.ServerInfoDialogListener, LoginDSDialogFragment.LoginDSDialogListener
+public class MainActivity extends AppCompatActivity implements ServerInfoDialogFragment.ServerInfoDialogListener,
+        LoginDSDialogFragment.LoginDSDialogListener,
+        JoinSessionDialogFragment.JoinSessionDialogListener
 {
 
     private CMRunnable m_cmRunnable;
@@ -113,8 +115,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 break;
             case "22": // join a session
                 printMessageln("Not supported yet!");
-                //joinSession();
-                //from here
+                joinSession();
                 break;
             case "23": // synchronously join a session
                 printMessageln("Not supported yet!");
@@ -525,6 +526,24 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     {
         m_cmRunnable.setMenu("requestSessionInfoDS");
         wakeUpCMRunnable();
+    }
+
+    private void joinSession()
+    {
+        DialogFragment dialog = new JoinSessionDialogFragment();
+        dialog.show(getFragmentManager(), "JoinSessionDialogFragment");
+    }
+
+    public void onJoinSessionDialogConfirmClick(DialogFragment dialog)
+    {
+        m_cmRunnable.setMenu("joinSession");
+        m_cmRunnable.setDialog(dialog);
+        wakeUpCMRunnable();
+    }
+
+    public void onJoinSessionDialogCancelClick(DialogFragment dialog)
+    {
+        // nothing to do
     }
 
 }
