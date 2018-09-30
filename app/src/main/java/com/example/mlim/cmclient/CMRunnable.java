@@ -169,6 +169,9 @@ public class CMRunnable implements Runnable {
                 case "joinSession":
                     joinSession();
                     break;
+                case "leaveSession":
+                    leaveSession();
+                    break;
                 default:
                     Log.e("CMRunnable : run()", "menu ("+m_strMenu+") not defined!");
                     break;
@@ -303,6 +306,18 @@ public class CMRunnable implements Runnable {
         {
             m_mainActivity.printMessage("failed the session-join request!\n");
         }
+
+    }
+
+    private void leaveSession()
+    {
+        boolean bRequestResult = false;
+        m_mainActivity.printMessage("====== leave the current session\n");
+        bRequestResult = m_cmClientStub.leaveSession();
+        if(bRequestResult)
+            m_mainActivity.printMessage("successfully sent the leave-session request.\n");
+        else
+            m_mainActivity.printMessage("failed the leave-session request!\n");
 
     }
 

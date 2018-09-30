@@ -114,7 +114,6 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 //syncSessionInfoDS();
                 break;
             case "22": // join a session
-                printMessageln("Not supported yet!");
                 joinSession();
                 break;
             case "23": // synchronously join a session
@@ -122,8 +121,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 //syncJoinSession();
                 break;
             case "24": // leave the current session
-                printMessageln("Not supported yet!");
-                //leaveSession();
+                leaveSession();
                 break;
             case "25": // change current group
                 printMessageln("Not supported yet!");
@@ -544,6 +542,12 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     public void onJoinSessionDialogCancelClick(DialogFragment dialog)
     {
         // nothing to do
+    }
+
+    private void leaveSession()
+    {
+        m_cmRunnable.setMenu("leaveSession");
+        wakeUpCMRunnable();
     }
 
 }
