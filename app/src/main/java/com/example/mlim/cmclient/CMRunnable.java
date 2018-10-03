@@ -175,6 +175,9 @@ public class CMRunnable implements Runnable {
                 case "changeGroup":
                     changeGroup();
                     break;
+                case "chat":
+                    chat();
+                    break;
                 default:
                     Log.e("CMRunnable : run()", "menu ("+m_strMenu+") not defined!");
                     break;
@@ -338,6 +341,24 @@ public class CMRunnable implements Runnable {
 
         if(strGroupName != null)
             m_cmClientStub.changeGroup(strGroupName);
+
+    }
+
+    private void chat()
+    {
+        if(m_dialog == null)
+        {
+            m_mainActivity.printMessage("Chat dialog unavailable!");
+            return;
+        }
+
+        m_mainActivity.printMessage("====== chat\n");
+        EditText targetEditText = m_dialog.getView().findViewById(R.id.chatTargetEditText);
+        String strTarget = targetEditText.getText().toString().trim();
+        EditText messageEditText = m_dialog.getView().findViewById(R.id.chatMessageEditText);
+        String strMessage = messageEditText.getText().toString().trim();
+
+        m_cmClientStub.chat(strTarget, strMessage);
 
     }
 

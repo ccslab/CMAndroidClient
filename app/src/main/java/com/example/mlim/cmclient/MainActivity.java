@@ -16,7 +16,8 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity implements ServerInfoDialogFragment.ServerInfoDialogListener,
         LoginDSDialogFragment.LoginDSDialogListener,
         JoinSessionDialogFragment.JoinSessionDialogListener,
-        ChangeGroupDialogFragment.ChangeGroupDialogListener
+        ChangeGroupDialogFragment.ChangeGroupDialogListener,
+        ChatDialogFragment.ChatDialogListener
 {
 
     private CMRunnable m_cmRunnable;
@@ -140,14 +141,14 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 //leaveSessionOfServer();
                 break;
             case "40": // chat
-                printMessageln("Not supported yet!");
-                //chat();
+                chat();
                 break;
             case "41": // test multicast chat in current group
                 printMessageln("Not supported yet!");
                 //multicastChat();
                 break;
             case "42": // test CMDummyEvent
+                //from here
                 printMessageln("Not supported yet!");
                 //testDummyEvent();
                 break;
@@ -564,6 +565,24 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     }
 
     public void onChangeGroupDialogCancelClick(DialogFragment dialog)
+    {
+        // nothing to do
+    }
+
+    private void chat()
+    {
+        DialogFragment dialog = new ChatDialogFragment();
+        dialog.show(getFragmentManager(), "ChatDialogFragment");
+    }
+
+    public void onChatDialogConfirmClick(DialogFragment dialog)
+    {
+        m_cmRunnable.setMenu("chat");
+        m_cmRunnable.setDialog(dialog);
+        wakeUpCMRunnable();
+    }
+
+    public void onChatDialogCancelClick(DialogFragment dialog)
     {
         // nothing to do
     }
