@@ -13,6 +13,18 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
+import kr.ac.konkuk.ccslab.cm.manager.CMConfigurator;
+import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
+import kr.ac.konkuk.ccslab.cm.util.CMUtil;
+
 public class MainActivity extends AppCompatActivity implements ServerInfoDialogFragment.ServerInfoDialogListener,
         LoginDSDialogFragment.LoginDSDialogListener,
         JoinSessionDialogFragment.JoinSessionDialogListener,
@@ -20,6 +32,8 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         ChatDialogFragment.ChatDialogListener
 {
 
+    private CMClientStub m_cmClientStub;
+    private CMClientEventHandler m_cmEventHandler;
     private CMRunnable m_cmRunnable;
 
     public static final String EXTRA_MESSAGE = "com.example.mlim.CMClient.MESSAGE";
@@ -51,11 +65,9 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         });
 
         // create and init CM
-        m_cmRunnable = new CMRunnable(this);
-        m_cmRunnable.initCM();
-
+        initCM();
         // check and update current server information
-        m_cmRunnable.checkUpdateServerInfo();
+        checkUpdateServerInfo();
 
         // CM will start after the user presses the confirm button of the server-info dialog.
     }
@@ -73,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 printAllMenus();
                 break;
             case "100": // start CM
-                m_cmRunnable.checkUpdateServerInfo();
+                checkUpdateServerInfo();
                 break;
             case "999": // terminate CM
                 terminateCM();
@@ -374,6 +386,77 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         return false;
     }
 
+    // create and init CM
+    public boolean initCM()
+    {
+        // create CM client stub object
+        m_cmClientStub = new CMClientStub();
+        // create and set an event handler to CM
+        m_cmEventHandler = new CMClientEventHandler(m_cmClientStub, this);
+        m_cmClientStub.setEventHandler(m_cmEventHandler);
+
+        // get the path of internal storage
+        String strInterPath = getFilesDir().getAbsolutePath();
+        Path interPath = Paths.get(strInterPath);
+        Path confPath = interPath.resolve("cm-client.conf");
+
+        // if the cm-client.conf file does not exists in the internal storage,
+        if(!Files.exists(confPath))
+        {
+            // get cm-client.conf in the asset folder
+            InputStream is = null;
+            try {
+                is = getAssets().open("cm-client.conf");
+            } catch(IOException e) {
+                Log.e("MainActivity:initCM()", e.getMessage());
+                printMessage("Open configuration file error!");
+                return false;
+            }
+
+            try{
+                // copy cm-client.conf from the asset folder to the internal storage
+                Files.copy(is, confPath, StandardCopyOption.REPLACE_EXISTING);
+            } catch(IOException e) {
+                Log.e("MainActivity:initCM()", e.getMessage());
+                printMessage("Copy configuration file error!");
+                return false;
+            }
+        }
+
+        // set the home directory of the configuration file to CM
+        m_cmClientStub.setConfigurationHome(interPath);
+        Log.d("MainActivity:initCM()", "conf file path: "+confPath.toString());
+
+        // set the directory for transferred files
+        if(isExternalStorageWritable())
+        {
+            File externFile = getExternalFilesDir(null);
+            Path externPath = Paths.get(externFile.getPath());
+            m_cmClientStub.setTransferedFileHome(externPath);
+            Log.d("MainActivity:initCM()", "transfered file path: "+ CMConfigurator.getConfiguration(confPath.toString(), "FILE_PATH"));
+        }
+        else
+        {
+            Log.e("MainActivity:initCM()", "External storage is not available!");
+            printMessage("External storage is not available!");
+            return false;
+        }
+
+        return true;
+    }
+
+    public void checkUpdateServerInfo()
+    {
+        // get current server information to string/server_address and string/server_port
+        String strCurServerAddress = null;
+        int nCurServerPort = -1;
+        strCurServerAddress = m_cmClientStub.getServerAddress();
+        nCurServerPort = m_cmClientStub.getServerPort();
+        Log.d("MainActivity : checkUpdateServerInfo()", "server info("+strCurServerAddress+", "+nCurServerPort+").");
+
+        showServerInfoDialog(strCurServerAddress, nCurServerPort);
+    }
+
     public void showServerInfoDialog(String strAddress, int nPort)
     {
         // Create an instance of the dialog fragment and show it
@@ -398,8 +481,8 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         int nPort = Integer.parseInt(portEditText.getText().toString().trim());
         Log.d("MainActivity : onServerInfoDialogConfirmClick()", "server input("+strAddress+", "+nPort+").");
 
-        m_cmRunnable.getClientStub().setServerAddress(strAddress);
-        m_cmRunnable.getClientStub().setServerPort(nPort);
+        m_cmClientStub.setServerAddress(strAddress);
+        m_cmClientStub.setServerPort(nPort);
 
         // CM must start in a separate thread because of the Android policy !!
         startCM();
@@ -416,6 +499,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         TextView cmTextView = (TextView) findViewById(R.id.cmTextView);
         cmTextView.setText("");
 
+        m_cmRunnable = new CMRunnable(m_cmClientStub,this);
         Thread t = new Thread(m_cmRunnable);
         t.start();
     }
@@ -504,10 +588,29 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     public void onLoginDSDialogConfirmClick(DialogFragment dialog)
     {
+        /*
         // wakeup the CM thread (called after dialog)
         m_cmRunnable.setMenu("loginDS");
         m_cmRunnable.setDialog(dialog);
         wakeUpCMRunnable();
+        */
+
+        EditText idEditText = dialog.getView().findViewById(R.id.loginDSIDEditText);
+        EditText passwdEditText = dialog.getView().findViewById(R.id.loginDSPasswdEditText);
+        String strID = idEditText.getText().toString().trim();
+        String strPasswd = passwdEditText.getText().toString();
+        String strEncPasswd = CMUtil.getSHA1Hash(strPasswd);
+
+        boolean bRequestResult = m_cmClientStub.loginCM(strID, strEncPasswd);
+        if(bRequestResult)
+        {
+            printMessage("successfully sent the login request.\n");
+        }
+        else
+        {
+            printMessage("failed the login request!\n");
+        }
+
     }
 
     public void onLoginDSDialogCancelClick(DialogFragment dialog)
@@ -517,14 +620,41 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     private void logoutDS()
     {
+        /*
         m_cmRunnable.setMenu("logoutDS");
         wakeUpCMRunnable();
+        */
+        boolean bRequestResult = false;
+        printMessage("====== logout from default server\n");
+        bRequestResult = m_cmClientStub.logoutCM();
+        if(bRequestResult) {
+            printMessage("successfully sent the logout request.\n");
+            toastMessage("로그아웃 요청!", Toast.LENGTH_LONG);
+        }
+        else {
+            printMessage("failed the logout request!\n");
+        }
+
     }
 
     private void requestSessionInfoDS()
     {
+        /*
         m_cmRunnable.setMenu("requestSessionInfoDS");
         wakeUpCMRunnable();
+        */
+        boolean bRequestResult = false;
+        printMessage("====== request session info from default server\n");
+        bRequestResult = m_cmClientStub.requestSessionInfo();
+        if(bRequestResult)
+        {
+            printMessage("successfully sent the session-info request.\n");
+        }
+        else
+        {
+            printMessage("failed the session-info request!\n");
+        }
+
     }
 
     private void joinSession()
@@ -535,9 +665,26 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     public void onJoinSessionDialogConfirmClick(DialogFragment dialog)
     {
+        /*
         m_cmRunnable.setMenu("joinSession");
         m_cmRunnable.setDialog(dialog);
         wakeUpCMRunnable();
+        */
+        printMessage("====== join a session\n");
+
+        EditText sessionNameEditText = dialog.getView().findViewById(R.id.joinSessionNameEditText);
+        String strSessionName = sessionNameEditText.getText().toString().trim();
+        boolean bRequestResult = m_cmClientStub.joinSession(strSessionName);
+
+        if(bRequestResult)
+        {
+            printMessage("successfully sent the session-join request.\n");
+        }
+        else
+        {
+            printMessage("failed the session-join request!\n");
+        }
+
     }
 
     public void onJoinSessionDialogCancelClick(DialogFragment dialog)
@@ -547,8 +694,18 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     private void leaveSession()
     {
+        /*
         m_cmRunnable.setMenu("leaveSession");
         wakeUpCMRunnable();
+        */
+        boolean bRequestResult = false;
+        printMessage("====== leave the current session\n");
+        bRequestResult = m_cmClientStub.leaveSession();
+        if(bRequestResult)
+            printMessage("successfully sent the leave-session request.\n");
+        else
+            printMessage("failed the leave-session request!\n");
+
     }
 
     private void changeGroup()
@@ -559,9 +716,18 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     public void onChangeGroupDialogConfirmClick(DialogFragment dialog)
     {
+        /*
         m_cmRunnable.setMenu("changeGroup");
         m_cmRunnable.setDialog(dialog);
         wakeUpCMRunnable();
+        */
+        printMessage("====== change group\n");
+        EditText changeGroupNameEditText = dialog.getView().findViewById(R.id.changeGroupNameEditText);
+        String strGroupName = changeGroupNameEditText.getText().toString().trim();
+
+        if(strGroupName != null)
+            m_cmClientStub.changeGroup(strGroupName);
+
     }
 
     public void onChangeGroupDialogCancelClick(DialogFragment dialog)
@@ -577,9 +743,19 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     public void onChatDialogConfirmClick(DialogFragment dialog)
     {
+        /*
         m_cmRunnable.setMenu("chat");
         m_cmRunnable.setDialog(dialog);
         wakeUpCMRunnable();
+        */
+        printMessage("====== chat\n");
+        EditText targetEditText = dialog.getView().findViewById(R.id.chatTargetEditText);
+        String strTarget = targetEditText.getText().toString().trim();
+        EditText messageEditText = dialog.getView().findViewById(R.id.chatMessageEditText);
+        String strMessage = messageEditText.getText().toString().trim();
+
+        m_cmClientStub.chat(strTarget, strMessage);
+
     }
 
     public void onChatDialogCancelClick(DialogFragment dialog)
