@@ -91,10 +91,10 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 terminateCM();
                 break;
             case "1":   // connect to default server
-                connectionDS();
+                connectToDS();
                 break;
             case "2":   // disconnect from default server
-                disconnectionDS();
+                disconnectFromDS();
                 break;
             case "3":   // connect to designated server
                 printMessageln("Not supported yet!");
@@ -485,7 +485,19 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         m_cmClientStub.setServerPort(nPort);
 
         // CM must start in a separate thread because of the Android policy !!
-        startCM();
+        // CM is updated to support this requirement.
+        boolean bRet = m_cmClientStub.startCM();
+        if(!bRet)
+        {
+            printMessageln("CM initialization error!");
+        }
+        else
+        {
+            printMessageln("Client CM starts.");
+            printMessageln("Type \"0\" for menu.");
+        }
+
+        //startCM();  // need to change to another method name!
     }
 
     @Override
@@ -494,6 +506,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         // nothing to do yet!
     }
 
+    /*
     private void startCM()
     {
         TextView cmTextView = (TextView) findViewById(R.id.cmTextView);
@@ -503,6 +516,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         Thread t = new Thread(m_cmRunnable);
         t.start();
     }
+    */
 
     private void printAllMenus()
     {
@@ -552,6 +566,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     }
 
+    /*
     private void wakeUpCMRunnable()
     {
         synchronized(m_cmRunnable.getSyncObject())
@@ -559,23 +574,43 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
             m_cmRunnable.getSyncObject().notify();
         }
     }
+    */
 
     private void terminateCM()
     {
-        m_cmRunnable.setMenu("terminateCM");
-        wakeUpCMRunnable();
+        m_cmClientStub.disconnectFromServer();
+        m_cmClientStub.terminateCM();
+        printMessage("Client CM terminates.\n");
     }
 
-    private void connectionDS()
+    private void connectToDS()
     {
-        m_cmRunnable.setMenu("connectionDS");
-        wakeUpCMRunnable();
+        printMessage("====== connect to default server\n");
+        boolean ret = m_cmClientStub.connectToServer();
+        if(ret)
+        {
+            printMessage("Successfully connected to the default server.\n");
+        }
+        else
+        {
+            printMessage("Cannot connect to the default server!\n");
+        }
+        printMessage("======\n");
     }
 
-    private void disconnectionDS()
+    private void disconnectFromDS()
     {
-        m_cmRunnable.setMenu("disconnectionDS");
-        wakeUpCMRunnable();
+        printMessage("====== disconnect from default server\n");
+        boolean ret = m_cmClientStub.disconnectFromServer();
+        if(ret)
+        {
+            printMessage("Successfully disconnected from the default server.\n");
+        }
+        else
+        {
+            printMessage("Error while disconnecting from the default server!");
+        }
+        printMessage("======\n");
     }
 
     private void loginDS()
