@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/chTypeTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/channel_type_title" />
+
+    <RadioGroup
+        android:id="@+id/chRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="122dp" >
+
+        <RadioButton
+            android:id="@+id/sockChRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/socket_channel" />
+
+        <RadioButton
+            android:id="@+id/datagramChRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/datagram_channel" />
+
+        <RadioButton
+            android:id="@+id/multicastChRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/multicast_channel" />
+
+    </RadioGroup>
+
+</LinearLayout>

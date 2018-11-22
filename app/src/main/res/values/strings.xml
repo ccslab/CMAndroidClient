@@ -19,4 +19,17 @@
     <string name="chat_target">Target User</string>
     <string name="chat_message">Message</string>
     <string name="chat_target_hint">/b, /s, /g, /username</string>
+    <string name="channel_type_title">Channel Type</string>
+    <string name="socket_channel">SocketChannel</string>
+    <string name="datagram_channel">DatagramChannel</string>
+    <string name="multicast_channel">MulticastChannel</string>
+    <string name="add_socket_channel">add socket channel</string>
+    <string name="block_channel">Blocking Channel</string>
+    <string name="non_block_channel">Nonblocking Channel</string>
+    <string name="sync_async_call">Synchronous / Asynchronous Call</string>
+    <string name="sync_call">Synchronous Call</string>
+    <string name="async_call">Asynchronous Call</string>
+    <string name="ch_key_title"><![CDATA[Channel Key (> 0)]]></string>
+    <string name="add_ch_key">1</string>
+    <string name="server_name_title">Server Name (empty for default server)</string>
 </resources>

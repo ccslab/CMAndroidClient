@@ -10,12 +10,14 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.SocketChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,7 +31,9 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         LoginDSDialogFragment.LoginDSDialogListener,
         JoinSessionDialogFragment.JoinSessionDialogListener,
         ChangeGroupDialogFragment.ChangeGroupDialogListener,
-        ChatDialogFragment.ChatDialogListener
+        ChatDialogFragment.ChatDialogListener,
+        AddChannelDialogFragment.AddChannelDialogListener,
+        AddSocketChannelDialogFragment.AddSocketChannelDialogListener
 {
 
     private CMClientStub m_cmClientStub;
@@ -212,8 +216,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 //changeConfiguration();
                 break;
             case "60": // add additional channel
-                printMessageln("Not supported yet!");
-                //addChannel();
+                addChannel();
                 break;
             case "61": // remove additional channel
                 printMessageln("Not supported yet!");
@@ -553,13 +556,16 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     }
 
+    ////////// terminate CM
     private void terminateCM()
     {
         m_cmClientStub.disconnectFromServer();
         m_cmClientStub.terminateCM();
         printMessage("Client CM terminates.\n");
     }
+    //////////
 
+    ////////// connect to default server
     private void connectToDS()
     {
         printMessage("====== connect to default server\n");
@@ -574,7 +580,9 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         }
         printMessage("======\n");
     }
+    //////////
 
+    ////////// disconnect from default server
     private void disconnectFromDS()
     {
         printMessage("====== disconnect from default server\n");
@@ -589,7 +597,9 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         }
         printMessage("======\n");
     }
+    //////////
 
+    ////////// login
     private void loginDS()
     {
         // Create an instance of the dialog fragment and show it
@@ -622,7 +632,9 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     {
         // nothing to do
     }
+    //////////
 
+    ////////// logout
     private void logoutDS()
     {
         boolean bRequestResult = false;
@@ -637,7 +649,9 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         }
 
     }
+    //////////
 
+    ////////// request session info
     private void requestSessionInfoDS()
     {
         boolean bRequestResult = false;
@@ -653,7 +667,9 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         }
 
     }
+    //////////
 
+    ////////// join session
     private void joinSession()
     {
         DialogFragment dialog = new JoinSessionDialogFragment();
@@ -683,7 +699,9 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     {
         // nothing to do
     }
+    //////////
 
+    ////////// leave session
     private void leaveSession()
     {
         boolean bRequestResult = false;
@@ -695,7 +713,9 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
             printMessage("failed the leave-session request!\n");
 
     }
+    //////////
 
+    ////////// change group
     private void changeGroup()
     {
         DialogFragment dialog = new ChangeGroupDialogFragment();
@@ -717,7 +737,9 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     {
         // nothing to do
     }
+    //////////
 
+    ////////// chat
     private void chat()
     {
         DialogFragment dialog = new ChatDialogFragment();
@@ -740,5 +762,151 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     {
         // nothing to do
     }
+    //////////
+
+    ////////// add channel
+    private void addChannel()
+    {
+        DialogFragment dialog = new AddChannelDialogFragment();
+        dialog.show(getFragmentManager(), "AddChannelDialogFragment");
+    }
+
+    public void onAddChannelDialogConfirmClick(DialogFragment dialog)
+    {
+        printMessage("====== add channel\n");
+        RadioButton sockChRadioButton = dialog.getView().findViewById(R.id.sockChRadioButton);
+        RadioButton datagramChRadioButton = dialog.getView().findViewById(R.id.datagramChRadioButton);
+        RadioButton multicastChRadioButton = dialog.getView().findViewById(R.id.multicastChRadioButton);
+
+        if(sockChRadioButton.isChecked())
+        {
+            printMessage("socket channel checked\n");
+            DialogFragment sockChDialog = new AddSocketChannelDialogFragment();
+            sockChDialog.show(getFragmentManager(), "AddSocketChannelDialogFragment");
+        }
+        else if(datagramChRadioButton.isChecked())
+        {
+            printMessage("datagram channel checked\n");
+            // from here
+        }
+        else if(multicastChRadioButton.isChecked())
+        {
+            printMessage("multicast channel checked\n");
+            // not yet
+        }
+    }
+
+    public void onAddChannelDialogCancelClick(DialogFragment dialog)
+    {
+        // nothing to do
+    }
+
+    public void onAddSocketChannelDialogConfirmClick(DialogFragment dialog)
+    {
+        int nChKey = -1;
+        String strServerName = null;
+        boolean isBlock = true;
+        boolean isSyncCall = true;
+        SocketChannel sc = null;
+        boolean result = false;
+
+        EditText chKeyEditText = dialog.getView().findViewById(R.id.chKeyEditText);
+        nChKey = Integer.parseInt(chKeyEditText.getText().toString().trim());
+
+        EditText serverNameEditText = dialog.getView().findViewById(R.id.serverNameEditText);
+        strServerName = serverNameEditText.getText().toString().trim();
+        if(strServerName == null || strServerName.equals(""))
+            strServerName = "SERVER"; // default server name
+
+        RadioButton blockRadioButton = dialog.getView().findViewById(R.id.blockChRadioButton);
+        RadioButton nonBlockRadioButton = dialog.getView().findViewById(R.id.nonBlockChRadioButton);
+        if(blockRadioButton.isChecked()) isBlock = true;
+        else if(nonBlockRadioButton.isChecked()) isBlock = false;
+
+        RadioButton syncCallRadioButton = dialog.getView().findViewById(R.id.syncCallRadioButton);
+        RadioButton asyncCallRadioButton = dialog.getView().findViewById(R.id.asyncCallRadioButton);
+        if(syncCallRadioButton.isChecked()) isSyncCall = true;
+        else if(asyncCallRadioButton.isChecked()) isSyncCall = false;
+
+        if(!isBlock && nChKey <= 0)
+        {
+            printMessage("invalid nonblocking socket channel key ("+nChKey+")!\n");
+            return;
+        }
+        else if(isBlock && nChKey < 0)
+        {
+            printMessage("invalid blocking socket channel key ("+nChKey+")!\n");
+            return;
+        }
+
+        if(isBlock)
+        {
+            if(isSyncCall)
+            {
+                //m_eventHandler.setStartTime(System.currentTimeMillis());
+                sc = m_cmClientStub.syncAddBlockSocketChannel(nChKey, strServerName);
+                //lDelay = System.currentTimeMillis() - m_eventHandler.getStartTime();
+                if(sc != null)
+                {
+                    printMessage("Successfully added a blocking socket channel both "
+                            + "at the client and the server: key("+nChKey+"), server("+strServerName+")\n");
+                    //printMessage("return delay: "+lDelay+" ms.\n");
+                }
+                else
+                    printMessage("Failed to add a blocking socket channel both at "
+                            + "the client and the server: key("+nChKey+"), server("+strServerName+")\n");
+            }
+            else
+            {
+                //m_eventHandler.setStartTime(System.currentTimeMillis());
+                result = m_cmClientStub.addBlockSocketChannel(nChKey, strServerName);
+                //lDelay = System.currentTimeMillis() - m_eventHandler.getStartTime();
+                if(result)
+                {
+                    printMessage("Successfully added a blocking socket channel at the client and "
+                            +"requested to add the channel info to the server: key("+nChKey+"), server("
+                            +strServerName+")\n");
+                    //printMessage("return delay: "+lDelay+" ms.\n");
+                }
+                else
+                    printMessage("Failed to add a blocking socket channel at the client or "
+                            +"failed to request to add the channel info to the server: key("+nChKey
+                            +"), server("+strServerName+")\n");
+            }
+        }
+        else
+        {
+            if(isSyncCall)
+            {
+                sc = m_cmClientStub.syncAddNonBlockSocketChannel(nChKey, strServerName);
+                if(sc != null)
+                    printMessage("Successfully added a nonblocking socket channel both at the client "
+                            + "and the server: key("+nChKey+"), server("+strServerName+")\n");
+                else
+                    printMessage("Failed to add a nonblocking socket channel both at the client "
+                            + "and the server: key("+nChKey+") to server("+strServerName+")\n");
+            }
+            else
+            {
+                result = m_cmClientStub.addNonBlockSocketChannel(nChKey, strServerName);
+                if(result)
+                    printMessage("Successfully added a nonblocking socket channel at the client and "
+                            + "requested to add the channel info to the server: key("+nChKey+"), server("
+                            +strServerName+")\n");
+                else
+                    printMessage("Failed to add a nonblocking socket channe at the client or "
+                            + "failed to request to add the channel info to the server: key("+nChKey
+                            +") to server("+strServerName+")\n");
+            }
+        }
+
+    }
+
+    public void onAddSocketChannelDialogCancelClick(DialogFragment dialog)
+    {
+        // nothing to do
+    }
+
+    //////////
 
 }
