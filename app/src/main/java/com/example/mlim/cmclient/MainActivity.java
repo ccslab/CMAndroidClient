@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     private CMClientStub m_cmClientStub;
     private CMClientEventHandler m_cmEventHandler;
-    private CMRunnable m_cmRunnable;
 
     public static final String EXTRA_MESSAGE = "com.example.mlim.CMClient.MESSAGE";
 
@@ -506,18 +505,6 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         // nothing to do yet!
     }
 
-    /*
-    private void startCM()
-    {
-        TextView cmTextView = (TextView) findViewById(R.id.cmTextView);
-        cmTextView.setText("");
-
-        m_cmRunnable = new CMRunnable(m_cmClientStub,this);
-        Thread t = new Thread(m_cmRunnable);
-        t.start();
-    }
-    */
-
     private void printAllMenus()
     {
         printMessage("---------------------------------- Help\n");
@@ -566,16 +553,6 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     }
 
-    /*
-    private void wakeUpCMRunnable()
-    {
-        synchronized(m_cmRunnable.getSyncObject())
-        {
-            m_cmRunnable.getSyncObject().notify();
-        }
-    }
-    */
-
     private void terminateCM()
     {
         m_cmClientStub.disconnectFromServer();
@@ -623,13 +600,6 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     public void onLoginDSDialogConfirmClick(DialogFragment dialog)
     {
-        /*
-        // wakeup the CM thread (called after dialog)
-        m_cmRunnable.setMenu("loginDS");
-        m_cmRunnable.setDialog(dialog);
-        wakeUpCMRunnable();
-        */
-
         EditText idEditText = dialog.getView().findViewById(R.id.loginDSIDEditText);
         EditText passwdEditText = dialog.getView().findViewById(R.id.loginDSPasswdEditText);
         String strID = idEditText.getText().toString().trim();
@@ -655,10 +625,6 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     private void logoutDS()
     {
-        /*
-        m_cmRunnable.setMenu("logoutDS");
-        wakeUpCMRunnable();
-        */
         boolean bRequestResult = false;
         printMessage("====== logout from default server\n");
         bRequestResult = m_cmClientStub.logoutCM();
@@ -674,10 +640,6 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     private void requestSessionInfoDS()
     {
-        /*
-        m_cmRunnable.setMenu("requestSessionInfoDS");
-        wakeUpCMRunnable();
-        */
         boolean bRequestResult = false;
         printMessage("====== request session info from default server\n");
         bRequestResult = m_cmClientStub.requestSessionInfo();
@@ -700,11 +662,6 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     public void onJoinSessionDialogConfirmClick(DialogFragment dialog)
     {
-        /*
-        m_cmRunnable.setMenu("joinSession");
-        m_cmRunnable.setDialog(dialog);
-        wakeUpCMRunnable();
-        */
         printMessage("====== join a session\n");
 
         EditText sessionNameEditText = dialog.getView().findViewById(R.id.joinSessionNameEditText);
@@ -729,10 +686,6 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     private void leaveSession()
     {
-        /*
-        m_cmRunnable.setMenu("leaveSession");
-        wakeUpCMRunnable();
-        */
         boolean bRequestResult = false;
         printMessage("====== leave the current session\n");
         bRequestResult = m_cmClientStub.leaveSession();
@@ -751,11 +704,6 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     public void onChangeGroupDialogConfirmClick(DialogFragment dialog)
     {
-        /*
-        m_cmRunnable.setMenu("changeGroup");
-        m_cmRunnable.setDialog(dialog);
-        wakeUpCMRunnable();
-        */
         printMessage("====== change group\n");
         EditText changeGroupNameEditText = dialog.getView().findViewById(R.id.changeGroupNameEditText);
         String strGroupName = changeGroupNameEditText.getText().toString().trim();
@@ -778,11 +726,6 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     public void onChatDialogConfirmClick(DialogFragment dialog)
     {
-        /*
-        m_cmRunnable.setMenu("chat");
-        m_cmRunnable.setDialog(dialog);
-        wakeUpCMRunnable();
-        */
         printMessage("====== chat\n");
         EditText targetEditText = dialog.getView().findViewById(R.id.chatTargetEditText);
         String strTarget = targetEditText.getText().toString().trim();
