@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/addDatagramChTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/add_datagram_channel" />
+
+    <RadioGroup
+        android:id="@+id/datagramChRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="53dp">
+
+        <RadioButton
+            android:id="@+id/blockChRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/block_channel" />
+
+        <RadioButton
+            android:id="@+id/nonBlockChRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="@string/non_block_channel" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/portTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/port_ch_key_title" />
+
+    <EditText
+        android:id="@+id/portNumberEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName" />
+</LinearLayout>

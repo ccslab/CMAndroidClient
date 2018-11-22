@@ -17,6 +17,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.DatagramChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,7 +34,8 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         ChangeGroupDialogFragment.ChangeGroupDialogListener,
         ChatDialogFragment.ChatDialogListener,
         AddChannelDialogFragment.AddChannelDialogListener,
-        AddSocketChannelDialogFragment.AddSocketChannelDialogListener
+        AddSocketChannelDialogFragment.AddSocketChannelDialogListener,
+        AddDatagramChannelDialogFragment.AddDatagramChannelDialogListener
 {
 
     private CMClientStub m_cmClientStub;
@@ -787,12 +789,13 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         else if(datagramChRadioButton.isChecked())
         {
             printMessage("datagram channel checked\n");
-            // from here
+            DialogFragment datagramChDialog = new AddDatagramChannelDialogFragment();
+            datagramChDialog.show(getFragmentManager(), "AddDatagramChannelDialogFragment");
         }
         else if(multicastChRadioButton.isChecked())
         {
             printMessage("multicast channel checked\n");
-            // not yet
+            // from here
         }
     }
 
@@ -903,6 +906,49 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     }
 
     public void onAddSocketChannelDialogCancelClick(DialogFragment dialog)
+    {
+        // nothing to do
+    }
+
+    public void onAddDatagramChannelDialogConfirmClick(DialogFragment dialog)
+    {
+        int nChPort = -1;
+        boolean isBlock = true;
+        DatagramChannel dc = null;
+
+        RadioButton blockChRadioButton = dialog.getView().findViewById(R.id.blockChRadioButton);
+        RadioButton nonBlockChRadioButton = dialog.getView().findViewById(R.id.nonBlockChRadioButton);
+        if(blockChRadioButton.isChecked()) isBlock = true;
+        else if(nonBlockChRadioButton.isChecked()) isBlock = false;
+
+        EditText portNumberEditText = dialog.getView().findViewById(R.id.portNumberEditText);
+        try{
+            nChPort = Integer.parseInt(portNumberEditText.getText().toString().trim());
+        }catch(NumberFormatException e){
+            printMessage("The channel UDP port must be an integer number!\n");
+            return;
+        }
+
+        if(isBlock)
+        {
+            dc = m_cmClientStub.addBlockDatagramChannel(nChPort);
+            if(dc != null)
+                printMessage("Successfully added a blocking datagram socket channel: port("+nChPort+")\n");
+            else
+                printMessage("Failed to add a blocking datagram socket channel: port("+nChPort+")\n");
+        }
+        else
+        {
+            dc = m_cmClientStub.addNonBlockDatagramChannel(nChPort);
+            if(dc != null)
+                printMessage("Successfully added a non-blocking datagram socket channel: port("+nChPort+")\n");
+            else
+                printMessage("Failed to add a non-blocking datagram socket channel: port("+nChPort+")\n");
+        }
+
+    }
+
+    public void onAddDatagramChannelDialogCancelClick(DialogFragment dialog)
     {
         // nothing to do
     }
