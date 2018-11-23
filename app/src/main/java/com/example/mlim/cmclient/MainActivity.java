@@ -35,7 +35,8 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         ChatDialogFragment.ChatDialogListener,
         AddChannelDialogFragment.AddChannelDialogListener,
         AddSocketChannelDialogFragment.AddSocketChannelDialogListener,
-        AddDatagramChannelDialogFragment.AddDatagramChannelDialogListener
+        AddDatagramChannelDialogFragment.AddDatagramChannelDialogListener,
+        AddMulticastChannelDialogFragment.AddMulticastChannelDialogListener
 {
 
     private CMClientStub m_cmClientStub;
@@ -501,7 +502,6 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
             printMessageln("Type \"0\" for menu.");
         }
 
-        //startCM();  // need to change to another method name!
     }
 
     @Override
@@ -795,7 +795,9 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         else if(multicastChRadioButton.isChecked())
         {
             printMessage("multicast channel checked\n");
-            // from here
+            printMessage("Android does not support NIO MULTICAST CHANNEL yet!!");
+            DialogFragment multicastChDialog = new AddMulticastChannelDialogFragment();
+            multicastChDialog.show(getFragmentManager(), "AddMulticastChannelDialogFragment");
         }
     }
 
@@ -949,6 +951,48 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     }
 
     public void onAddDatagramChannelDialogCancelClick(DialogFragment dialog)
+    {
+        // nothing to do
+    }
+
+    public void onAddMulticastChannelDialogConfirmClick(DialogFragment dialog)
+    {
+        String strSessionName = null;
+        String strGroupName = null;
+        String strChAddress = null;
+        int nChPort = -1;
+        boolean result = false;
+
+        EditText snameEditText = dialog.getView().findViewById(R.id.sessionNameEditText);
+        EditText gnameEditText = dialog.getView().findViewById(R.id.groupNameEditText);
+        EditText addrEditText = dialog.getView().findViewById(R.id.multicastAddrEditText);
+        EditText portEditText = dialog.getView().findViewById(R.id.multicastPortEditText);
+
+        strSessionName = snameEditText.getText().toString().trim();
+        strGroupName = gnameEditText.getText().toString().trim();
+        strChAddress = addrEditText.getText().toString().trim();
+        try{
+            nChPort = Integer.parseInt(portEditText.getText().toString().trim());
+        }catch(NumberFormatException e){
+            printMessage("The port number must be an integer number!");
+            return;
+        }
+
+        result = m_cmClientStub.addMulticastChannel(strSessionName, strGroupName, strChAddress, nChPort);
+        if(result)
+        {
+            printMessage("Successfully added a multicast channel: session("+strSessionName+"), group("
+                    +strGroupName+"), address("+strChAddress+"), port("+nChPort+")\n");
+        }
+        else
+        {
+            printMessage("Failed to add a multicast channel: session("+strSessionName+"), group("
+                    +strGroupName+"), address("+strChAddress+"), port("+nChPort+")\n");
+        }
+
+    }
+
+    public void onAddMulticastChannelDialogCancelClick(DialogFragment dialog)
     {
         // nothing to do
     }

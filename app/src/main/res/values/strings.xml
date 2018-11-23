@@ -34,4 +34,7 @@
     <string name="server_name_title">Server Name (empty for default server)</string>
     <string name="add_datagram_channel">add datagram channel</string>
     <string name="port_ch_key_title">Port number (key of datagram channel)</string>
+    <string name="add_multicast_channel">add multicast channel</string>
+    <string name="multicast_addr">Multicast Address</string>
+    <string name="multicast_port">Multicast Port Number</string>
 </resources>
