@@ -10,19 +10,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
-public class AddMulticastChannelDialogFragment extends DialogFragment {
+public class RemoveSocketChannelDialogFragment extends DialogFragment {
     private View m_view;
 
     /* The activity that creates an instance of this dialog fragment must
      * implement this interface in order to receive event callbacks.
      * Each method passes the DialogFragment in case the host needs to query it. */
-    public interface AddMulticastChannelDialogListener {
-        public void onAddMulticastChannelDialogConfirmClick(DialogFragment dialog);
-        public void onAddMulticastChannelDialogCancelClick(DialogFragment dialog);
+    public interface RemoveSocketChannelDialogListener {
+        public void onRemoveSocketChannelDialogConfirmClick(DialogFragment dialog);
+        public void onRemoveSocketChannelDialogCancelClick(DialogFragment dialog);
     }
 
     // Use this instance of the interface to deliver action events
-    AddMulticastChannelDialogFragment.AddMulticastChannelDialogListener m_listener;
+    RemoveSocketChannelDialogFragment.RemoveSocketChannelDialogListener m_listener;
 
     // Override the Fragment.onAttach() method to instantiate the ServerInfoDialogListener
     @Override
@@ -31,7 +31,7 @@ public class AddMulticastChannelDialogFragment extends DialogFragment {
         // Verify that the host activity implements the callback interface
         try {
             // Instantiate the NoticeDialogListener so we can send events to the host
-            m_listener = (AddMulticastChannelDialogFragment.AddMulticastChannelDialogListener) activity;
+            m_listener = (RemoveSocketChannelDialogFragment.RemoveSocketChannelDialogListener) activity;
         } catch (ClassCastException e) {
             // The activity doesn't implement the interface, throw exception
             throw new ClassCastException(activity.toString()
@@ -44,10 +44,10 @@ public class AddMulticastChannelDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         // Get the layout inflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        m_view = inflater.inflate(R.layout.dialog_multicast_channel, null);
+        m_view = inflater.inflate(R.layout.dialog_socket_channel, null);
 
-        TextView titleTextView = m_view.findViewById(R.id.mulicastChTitleTextView);
-        titleTextView.setText(R.string.add_multicast_channel);
+        TextView titleTextView = m_view.findViewById(R.id.socketChannelTitleTextView);
+        titleTextView.setText(R.string.remove_socket_channel);
 
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
@@ -57,13 +57,13 @@ public class AddMulticastChannelDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         // Send the positive button event back to the host activity
-                        m_listener.onAddMulticastChannelDialogConfirmClick(AddMulticastChannelDialogFragment.this);
+                        m_listener.onRemoveSocketChannelDialogConfirmClick(RemoveSocketChannelDialogFragment.this);
                     }
                 })
                 .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // Send the negative button event back to the host activity
-                        m_listener.onAddMulticastChannelDialogCancelClick(AddMulticastChannelDialogFragment.this);
+                        m_listener.onRemoveSocketChannelDialogCancelClick(RemoveSocketChannelDialogFragment.this);
                     }
                 });
 

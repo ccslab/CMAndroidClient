@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 
 public class AddSocketChannelDialogFragment extends DialogFragment {
     private View m_view;
@@ -43,7 +44,10 @@ public class AddSocketChannelDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         // Get the layout inflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        m_view = inflater.inflate(R.layout.dialog_add_socket_channel, null);
+        m_view = inflater.inflate(R.layout.dialog_socket_channel, null);
+
+        TextView titleTextView = m_view.findViewById(R.id.socketChannelTitleTextView);
+        titleTextView.setText(R.string.add_socket_channel);
 
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout

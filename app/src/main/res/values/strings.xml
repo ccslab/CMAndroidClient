@@ -30,11 +30,14 @@
     <string name="sync_call">Synchronous Call</string>
     <string name="async_call">Asynchronous Call</string>
     <string name="ch_key_title"><![CDATA[Channel Key (> 0)]]></string>
-    <string name="add_ch_key">1</string>
+    <string name="default_add_sock_ch_key">1</string>
     <string name="server_name_title">Server Name (empty for default server)</string>
     <string name="add_datagram_channel">add datagram channel</string>
     <string name="port_ch_key_title">Port number (key of datagram channel)</string>
     <string name="add_multicast_channel">add multicast channel</string>
     <string name="multicast_addr">Multicast Address</string>
     <string name="multicast_port">Multicast Port Number</string>
+    <string name="remove_socket_channel">Remove Socket Channel</string>
+    <string name="remove_datagram_channel">Remove Datagram Channel</string>
+    <string name="remove_multicast_channel">Remove Multicast Channel</string>
 </resources>

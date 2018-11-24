@@ -36,7 +36,11 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         AddChannelDialogFragment.AddChannelDialogListener,
         AddSocketChannelDialogFragment.AddSocketChannelDialogListener,
         AddDatagramChannelDialogFragment.AddDatagramChannelDialogListener,
-        AddMulticastChannelDialogFragment.AddMulticastChannelDialogListener
+        AddMulticastChannelDialogFragment.AddMulticastChannelDialogListener,
+        RemoveChannelDialogFragment.RemoveChannelDialogListener,
+        RemoveSocketChannelDialogFragment.RemoveSocketChannelDialogListener,
+        RemoveDatagramChannelDialogFragment.RemoveDatagramChannelDialogListener,
+        RemoveMulticastChannelDialogFragment.RemoveMulticastChannelDialogListener
 {
 
     private CMClientStub m_cmClientStub;
@@ -166,7 +170,6 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 //multicastChat();
                 break;
             case "42": // test CMDummyEvent
-                //from here
                 printMessageln("Not supported yet!");
                 //testDummyEvent();
                 break;
@@ -223,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 break;
             case "61": // remove additional channel
                 printMessageln("Not supported yet!");
-                //removeChannel();
+                removeChannel();
                 break;
             case "62": // test blocking channel
                 printMessageln("Not supported yet!");
@@ -769,13 +772,13 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     ////////// add channel
     private void addChannel()
     {
+        printMessage("====== add channel\n");
         DialogFragment dialog = new AddChannelDialogFragment();
         dialog.show(getFragmentManager(), "AddChannelDialogFragment");
     }
 
     public void onAddChannelDialogConfirmClick(DialogFragment dialog)
     {
-        printMessage("====== add channel\n");
         RadioButton sockChRadioButton = dialog.getView().findViewById(R.id.sockChRadioButton);
         RadioButton datagramChRadioButton = dialog.getView().findViewById(R.id.datagramChRadioButton);
         RadioButton multicastChRadioButton = dialog.getView().findViewById(R.id.multicastChRadioButton);
@@ -816,7 +819,12 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         boolean result = false;
 
         EditText chKeyEditText = dialog.getView().findViewById(R.id.chKeyEditText);
-        nChKey = Integer.parseInt(chKeyEditText.getText().toString().trim());
+        try {
+            nChKey = Integer.parseInt(chKeyEditText.getText().toString().trim());
+        }catch(NumberFormatException e){
+            printMessage("The channel key must be an integer number!");
+            return;
+        }
 
         EditText serverNameEditText = dialog.getView().findViewById(R.id.serverNameEditText);
         strServerName = serverNameEditText.getText().toString().trim();
@@ -999,4 +1007,216 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     //////////
 
+    ////////// remove channel
+
+    public void removeChannel()
+    {
+        printMessage("remove channel\n");
+        DialogFragment dialog = new RemoveChannelDialogFragment();
+        dialog.show(getFragmentManager(), "RemoveChannelDialogFragment");
+    }
+
+    public void onRemoveChannelDialogConfirmClick(DialogFragment dialog)
+    {
+        RadioButton sockChRadioButton = dialog.getView().findViewById(R.id.sockChRadioButton);
+        RadioButton datagramChRadioButton = dialog.getView().findViewById(R.id.datagramChRadioButton);
+        RadioButton multicastChRadioButton = dialog.getView().findViewById(R.id.multicastChRadioButton);
+
+        if(sockChRadioButton.isChecked())
+        {
+            printMessage("socket channel checked\n");
+            DialogFragment sockChDialog = new RemoveSocketChannelDialogFragment();
+            sockChDialog.show(getFragmentManager(), "RemoveSocketChannelDialogFragment");
+        }
+        else if(datagramChRadioButton.isChecked())
+        {
+            printMessage("datagram channel checked\n");
+            DialogFragment datagramChDialog = new RemoveDatagramChannelDialogFragment();
+            datagramChDialog.show(getFragmentManager(), "RemoveDatagramChannelDialogFragment");
+        }
+        else if(multicastChRadioButton.isChecked())
+        {
+            printMessage("multicast channel checked\n");
+            printMessage("Android does not support NIO MULTICAST CHANNEL yet!!");
+            DialogFragment multicastChDialog = new RemoveMulticastChannelDialogFragment();
+            multicastChDialog.show(getFragmentManager(), "RemoveMulticastChannelDialogFragment");
+        }
+
+    }
+
+    public void onRemoveChannelDialogCancelClick(DialogFragment dialog)
+    {
+        // nothing to do
+    }
+
+    public void onRemoveSocketChannelDialogConfirmClick(DialogFragment dialog)
+    {
+        int nChKey = -1;
+        String strServerName = null;
+        boolean isBlock = true;
+        boolean isSyncCall = true;
+        SocketChannel sc = null;
+        boolean result = false;
+
+        EditText chKeyEditText = dialog.getView().findViewById(R.id.chKeyEditText);
+        try {
+            nChKey = Integer.parseInt(chKeyEditText.getText().toString().trim());
+        }catch(NumberFormatException e){
+            printMessage("The channel key must be an integer number!");
+            return;
+        }
+
+        EditText serverNameEditText = dialog.getView().findViewById(R.id.serverNameEditText);
+        strServerName = serverNameEditText.getText().toString().trim();
+        if(strServerName == null || strServerName.equals(""))
+            strServerName = "SERVER"; // default server name
+
+        RadioButton blockRadioButton = dialog.getView().findViewById(R.id.blockChRadioButton);
+        RadioButton nonBlockRadioButton = dialog.getView().findViewById(R.id.nonBlockChRadioButton);
+        if(blockRadioButton.isChecked()) isBlock = true;
+        else if(nonBlockRadioButton.isChecked()) isBlock = false;
+
+        RadioButton syncCallRadioButton = dialog.getView().findViewById(R.id.syncCallRadioButton);
+        RadioButton asyncCallRadioButton = dialog.getView().findViewById(R.id.asyncCallRadioButton);
+        if(syncCallRadioButton.isChecked()) isSyncCall = true;
+        else if(asyncCallRadioButton.isChecked()) isSyncCall = false;
+
+        if(isBlock)
+        {
+            if(isSyncCall)
+            {
+                //m_eventHandler.setStartTime(System.currentTimeMillis());
+                result = m_cmClientStub.syncRemoveBlockSocketChannel(nChKey, strServerName);
+                //lDelay = System.currentTimeMillis() - m_eventHandler.getStartTime();
+                if(result)
+                {
+                    printMessage("Successfully removed a blocking socket channel both "
+                            + "at the client and the server: key("+nChKey+"), server ("+strServerName+")\n");
+                    //printMessage("return delay: "+lDelay+" ms.\n");
+                }
+                else
+                    printMessage("Failed to remove a blocking socket channel both at the client "
+                            + "and the server: key("+nChKey+"), server ("+strServerName+")\n");
+            }
+            else
+            {
+                //m_eventHandler.setStartTime(System.currentTimeMillis());
+                result = m_cmClientStub.removeBlockSocketChannel(nChKey, strServerName);
+                //lDelay = System.currentTimeMillis() - m_eventHandler.getStartTime();
+                if(result)
+                {
+                    printMessage("Successfully removed a blocking socket channel at the client and "
+                            + "requested to remove it at the server: key("+nChKey+"), server("+strServerName+")\n");
+                    //printMessage("return delay: "+lDelay+" ms.\n");
+                }
+                else
+                    printMessage("Failed to remove a blocking socket channel at the client or "
+                            + "failed to request to remove it at the server: key("+nChKey+"), server("
+                            +strServerName+")\n");
+            }
+        }
+        else
+        {
+            result = m_cmClientStub.removeNonBlockSocketChannel(nChKey, strServerName);
+            if(result)
+                printMessage("Successfully removed a nonblocking socket channel: key("+nChKey
+                        +"), server("+strServerName+")\n");
+            else
+                printMessage("Failed to remove a nonblocing socket channel: key("+nChKey
+                        +"), server("+strServerName+")\n");
+        }
+
+    }
+
+    public void onRemoveSocketChannelDialogCancelClick(DialogFragment dialog)
+    {
+        // nothing to do
+    }
+
+    public void onRemoveDatagramChannelDialogConfirmClick(DialogFragment dialog)
+    {
+        int nChPort = -1;
+        boolean isBlock = true;
+        DatagramChannel dc = null;
+        boolean result = false;
+
+        RadioButton blockChRadioButton = dialog.getView().findViewById(R.id.blockChRadioButton);
+        RadioButton nonBlockChRadioButton = dialog.getView().findViewById(R.id.nonBlockChRadioButton);
+        if(blockChRadioButton.isChecked()) isBlock = true;
+        else if(nonBlockChRadioButton.isChecked()) isBlock = false;
+
+        EditText portNumberEditText = dialog.getView().findViewById(R.id.portNumberEditText);
+        try{
+            nChPort = Integer.parseInt(portNumberEditText.getText().toString().trim());
+        }catch(NumberFormatException e){
+            printMessage("The channel UDP port must be an integer number!\n");
+            return;
+        }
+
+        if(isBlock)
+        {
+            result = m_cmClientStub.removeBlockDatagramChannel(nChPort);
+            if(result)
+                printMessage("Successfully removed a blocking datagram socket channel: port("+nChPort+")\n");
+            else
+                printMessage("Failed to remove a blocking datagram socket channel: port("+nChPort+")\n");
+        }
+        else
+        {
+            result = m_cmClientStub.removeNonBlockDatagramChannel(nChPort);
+            if(result)
+                printMessage("Successfully removed a non-blocking datagram socket channel: port("+nChPort+")\n");
+            else
+                printMessage("Failed to remove a non-blocking datagram socket channel: port("+nChPort+")\n");
+        }
+    }
+
+    public void onRemoveDatagramChannelDialogCancelClick(DialogFragment dialog)
+    {
+        // nothing to do
+    }
+
+    public void onRemoveMulticastChannelDialogConfirmClick(DialogFragment dialog)
+    {
+        String strSessionName = null;
+        String strGroupName = null;
+        String strChAddress = null;
+        int nChPort = -1;
+        boolean result = false;
+
+        EditText snameEditText = dialog.getView().findViewById(R.id.sessionNameEditText);
+        EditText gnameEditText = dialog.getView().findViewById(R.id.groupNameEditText);
+        EditText addrEditText = dialog.getView().findViewById(R.id.multicastAddrEditText);
+        EditText portEditText = dialog.getView().findViewById(R.id.multicastPortEditText);
+
+        strSessionName = snameEditText.getText().toString().trim();
+        strGroupName = gnameEditText.getText().toString().trim();
+        strChAddress = addrEditText.getText().toString().trim();
+        try{
+            nChPort = Integer.parseInt(portEditText.getText().toString().trim());
+        }catch(NumberFormatException e){
+            printMessage("The port number must be an integer number!");
+            return;
+        }
+
+        result = m_cmClientStub.removeAdditionalMulticastChannel(strSessionName, strGroupName, strChAddress, nChPort);
+        if(result)
+        {
+            printMessage("Successfully removed a multicast channel: session("+strSessionName+"), group("
+                    +strGroupName+"), address("+strChAddress+"), port("+nChPort+")\n");
+        }
+        else
+        {
+            printMessage("Failed to remove a multicast channel: session("+strSessionName+"), group("
+                    +strGroupName+"), address("+strChAddress+"), port("+nChPort+")\n");
+        }
+
+    }
+
+    public void onRemoveMulticastChannelDialogCancelClick(DialogFragment dialog)
+    {
+        // nothing to do
+    }
+
+    //////////
 }

@@ -44,7 +44,7 @@ public class AddChannelDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         // Get the layout inflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        m_view = inflater.inflate(R.layout.dialog_add_channel, null);
+        m_view = inflater.inflate(R.layout.dialog_channel, null);
 
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
