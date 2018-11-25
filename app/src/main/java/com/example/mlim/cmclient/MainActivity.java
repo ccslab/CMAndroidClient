@@ -23,7 +23,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Iterator;
 
+import kr.ac.konkuk.ccslab.cm.entity.CMGroup;
+import kr.ac.konkuk.ccslab.cm.entity.CMGroupInfo;
+import kr.ac.konkuk.ccslab.cm.entity.CMServer;
+import kr.ac.konkuk.ccslab.cm.entity.CMSession;
+import kr.ac.konkuk.ccslab.cm.entity.CMUser;
+import kr.ac.konkuk.ccslab.cm.info.CMConfigurationInfo;
+import kr.ac.konkuk.ccslab.cm.info.CMInfo;
+import kr.ac.konkuk.ccslab.cm.info.CMInteractionInfo;
 import kr.ac.konkuk.ccslab.cm.manager.CMConfigurator;
 import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 import kr.ac.konkuk.ccslab.cm.util.CMUtil;
@@ -186,16 +195,13 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 //testUserPosition();
                 break;
             case "50": // print group info
-                printMessageln("Not supported yet!");
-                //printGroupInfo();
+                printGroupInfo();
                 break;
             case "51": // print current information about the client
-                printMessageln("Not supported yet!");
-                //currentUserStatus();
+                printCurrentUserStatus();
                 break;
             case "52": 	// print current channels information
-                printMessageln("Not supported yet!");
-                //printCurrentChannelInfo();
+                printCurrentChannelInfo();
                 break;
             case "53": // request additional server info
                 printMessageln("Not supported yet!");
@@ -214,10 +220,10 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 //measureOutputThroughput();
                 break;
             case "57": // print all configurations
-                printMessageln("Not supported yet!");
-                //printConfigurations();
+                printConfigurations();
                 break;
             case "58": // change configuration
+                // from here
                 printMessageln("Not supported yet!");
                 //changeConfiguration();
                 break;
@@ -1216,6 +1222,92 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     public void onRemoveMulticastChannelDialogCancelClick(DialogFragment dialog)
     {
         // nothing to do
+    }
+
+    //////////
+
+    ////////// print info
+
+    public void printGroupInfo()
+    {
+        // check local state
+        CMInteractionInfo interInfo = m_cmClientStub.getCMInfo().getInteractionInfo();
+        CMUser myself = interInfo.getMyself();
+
+        if(myself.getState() != CMInfo.CM_SESSION_JOIN)
+        {
+            //System.out.println("You should join a session and a group.");
+            printMessage("You should join a session and a group.\n");
+            return;
+        }
+
+        printMessage("========== print group info of current session\n");
+
+        CMSession session = interInfo.findSession(myself.getCurrentSession());
+        Iterator<CMGroup> iter = session.getGroupList().iterator();
+        printMessage("---------------------------------------------------------\n");
+        printMessage(String.format("%-20s%-20s%-20s%n", "group name", "multicast addr", "multicast port"));
+        printMessage("---------------------------------------------------------\n");
+
+        while(iter.hasNext())
+        {
+            CMGroupInfo gInfo = iter.next();
+            printMessage(String.format("%-20s%-20s%-20d%n", gInfo.getGroupName(), gInfo.getGroupAddress()
+                    , gInfo.getGroupPort()));
+        }
+
+        return;
+    }
+
+    public void printCurrentUserStatus()
+    {
+        CMInteractionInfo interInfo = m_cmClientStub.getCMInfo().getInteractionInfo();
+        CMUser myself = interInfo.getMyself();
+        CMConfigurationInfo confInfo = m_cmClientStub.getCMInfo().getConfigurationInfo();
+        printMessage("========== print current user status for the default server\n");
+        printMessage("name("+myself.getName()+"), session("+myself.getCurrentSession()+"), group("
+                +myself.getCurrentGroup()+"), udp port("+myself.getUDPPort()+"), state("
+                +myself.getState()+"), attachment download scheme("+confInfo.getAttachDownloadScheme()+").\n");
+
+        // for additional servers
+        Iterator<CMServer> iter = interInfo.getAddServerList().iterator();
+        while(iter.hasNext())
+        {
+            CMServer tserver = iter.next();
+            if(tserver.getNonBlockSocketChannelInfo().findChannel(0) != null)
+            {
+                printMessage("------ for additional server["+tserver.getServerName()+"]\n");
+                printMessage("current session("+tserver.getCurrentSessionName()+
+                        "), current group("+tserver.getCurrentGroupName()+"), state("
+                        +tserver.getClientState()+").");
+
+            }
+        }
+
+        return;
+    }
+
+    public void printCurrentChannelInfo()
+    {
+        printMessage("========== print current channel info\n");
+        String strChannels = m_cmClientStub.getCurrentChannelInfo();
+        printMessage(strChannels);
+    }
+
+    public void printConfigurations()
+    {
+        String[] strConfigurations;
+        printMessage("========== print all current configurations\n");
+        Path confPath = m_cmClientStub.getConfigurationHome().resolve("cm-client.conf");
+        strConfigurations = CMConfigurator.getConfigurations(confPath.toString());
+
+        printMessage("configuration file path: "+confPath.toString()+"\n");
+        for(String strConf : strConfigurations)
+        {
+            String[] strFieldValuePair;
+            strFieldValuePair = strConf.split("\\s+");
+            printMessage(strFieldValuePair[0]+" = "+strFieldValuePair[1]+"\n");
+        }
     }
 
     //////////
