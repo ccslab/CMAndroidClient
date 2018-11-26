@@ -49,7 +49,8 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         RemoveChannelDialogFragment.RemoveChannelDialogListener,
         RemoveSocketChannelDialogFragment.RemoveSocketChannelDialogListener,
         RemoveDatagramChannelDialogFragment.RemoveDatagramChannelDialogListener,
-        RemoveMulticastChannelDialogFragment.RemoveMulticastChannelDialogListener
+        RemoveMulticastChannelDialogFragment.RemoveMulticastChannelDialogListener,
+        RequestFileDialogFragment.RequestFileDialogListener
 {
 
     private CMClientStub m_cmClientStub;
@@ -223,7 +224,6 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 printConfigurations();
                 break;
             case "58": // change configuration
-                // from here
                 printMessageln("Not supported yet!");
                 //changeConfiguration();
                 break;
@@ -231,7 +231,6 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 addChannel();
                 break;
             case "61": // remove additional channel
-                printMessageln("Not supported yet!");
                 removeChannel();
                 break;
             case "62": // test blocking channel
@@ -243,10 +242,10 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 //setFilePath();
                 break;
             case "71": // request a file
-                printMessageln("Not supported yet!");
-                //requestFile();
+                requestFile();
                 break;
             case "72": // push a file
+                // from here
                 printMessageln("Not supported yet!");
                 //pushFile();
                 break;
@@ -778,7 +777,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     ////////// add channel
     private void addChannel()
     {
-        printMessage("====== add channel\n");
+        printMessage("========== add channel\n");
         DialogFragment dialog = new AddChannelDialogFragment();
         dialog.show(getFragmentManager(), "AddChannelDialogFragment");
     }
@@ -1017,7 +1016,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     public void removeChannel()
     {
-        printMessage("remove channel\n");
+        printMessage("========== remove channel\n");
         DialogFragment dialog = new RemoveChannelDialogFragment();
         dialog.show(getFragmentManager(), "RemoveChannelDialogFragment");
     }
@@ -1310,5 +1309,55 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         }
     }
 
+    //////////
+
+    ////////// request file
+
+    public void requestFile()
+    {
+        printMessage("========== request file\n");
+        DialogFragment dialog = new RequestFileDialogFragment();
+        dialog.show(getFragmentManager(), "RequestFileDialogFragment");
+    }
+
+    public void onRequestFileDialogConfirmClick(DialogFragment dialog)
+    {
+        boolean bReturn = false;
+        String strFileName = null;
+        String strFileOwner = null;
+        String strFileAppendMode = null;
+
+        EditText fileNameEditText = dialog.getView().findViewById(R.id.fileNameEditText);
+        strFileName = fileNameEditText.getText().toString().trim();
+        EditText fileOwnerEditText = dialog.getView().findViewById(R.id.fileOwnerEditText);
+        strFileOwner = fileOwnerEditText.getText().toString().trim();
+        RadioButton defaultRadioButton = dialog.getView().findViewById(R.id.defaultRadioButton);
+        RadioButton overwriteRadioButton = dialog.getView().findViewById(R.id.overwriteRadioButton);
+        RadioButton appendRadioButton = dialog.getView().findViewById(R.id.appendRadioButton);
+        if(defaultRadioButton.isChecked())
+            strFileAppendMode = "Default";
+        else if(overwriteRadioButton.isChecked())
+            strFileAppendMode = "Overwrite";
+        else
+            strFileAppendMode = "Append";
+
+        m_cmEventHandler.setStartTime(System.currentTimeMillis());	// set the start time of the request
+
+        if(strFileAppendMode.equals("Default"))
+            bReturn = m_cmClientStub.requestFile(strFileName, strFileOwner);
+        else if(strFileAppendMode.equals("Overwrite"))
+            bReturn = m_cmClientStub.requestFile(strFileName,  strFileOwner, CMInfo.FILE_OVERWRITE);
+        else
+            bReturn = m_cmClientStub.requestFile(strFileName, strFileOwner, CMInfo.FILE_APPEND);
+
+        if(!bReturn)
+            printMessage("Request file error! file("+strFileName+"), owner("+strFileOwner+").\n");
+
+    }
+
+    public void onRequestFileDialogCancelClick(DialogFragment dialog)
+    {
+        // nothing to do
+    }
     //////////
 }

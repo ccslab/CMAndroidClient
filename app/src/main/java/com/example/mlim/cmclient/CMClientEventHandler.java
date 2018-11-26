@@ -2,14 +2,18 @@ package com.example.mlim.cmclient;
 
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 
 import kr.ac.konkuk.ccslab.cm.entity.CMSessionInfo;
 import kr.ac.konkuk.ccslab.cm.event.CMDataEvent;
 import kr.ac.konkuk.ccslab.cm.event.CMEvent;
 import kr.ac.konkuk.ccslab.cm.event.CMEventHandler;
+import kr.ac.konkuk.ccslab.cm.event.CMFileEvent;
 import kr.ac.konkuk.ccslab.cm.event.CMInterestEvent;
 import kr.ac.konkuk.ccslab.cm.event.CMSessionEvent;
+import kr.ac.konkuk.ccslab.cm.info.CMConfigurationInfo;
 import kr.ac.konkuk.ccslab.cm.info.CMInfo;
 import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 
@@ -17,11 +21,17 @@ public class CMClientEventHandler implements CMEventHandler {
 
     private MainActivity m_mainActivity;
     private CMClientStub m_clientStub;
+    private long m_lStartTime;
+    private boolean m_bDistFileProc;
+    private boolean m_bReqAttachedFile;
 
     CMClientEventHandler(CMClientStub clientStub, MainActivity activity)
     {
         m_mainActivity = activity;
         m_clientStub = clientStub;
+        m_lStartTime = 0;
+        m_bDistFileProc = false;
+        m_bReqAttachedFile = false;
     }
 
     // event handling method
@@ -58,6 +68,41 @@ public class CMClientEventHandler implements CMEventHandler {
                 return;
         }
     }
+
+    //////////////////////////////////////////////////////////////////////////////
+    // get/set methods
+
+    public void setStartTime(long time)
+    {
+        m_lStartTime = time;
+    }
+
+    public long getStartTime()
+    {
+        return m_lStartTime;
+    }
+
+    public void setDistFileProc(boolean b)
+    {
+        m_bDistFileProc = b;
+    }
+
+    public boolean isDistFileProc()
+    {
+        return m_bDistFileProc;
+    }
+
+    public void setReqAttachedFile(boolean bReq)
+    {
+        m_bReqAttachedFile = bReq;
+    }
+
+    public boolean isReqAttachedFile()
+    {
+        return m_bReqAttachedFile;
+    }
+
+    //////////////////////////////////////////////////////////////////////////////
 
     private void processSessionEvent(CMEvent cme)
     {
@@ -256,7 +301,67 @@ public class CMClientEventHandler implements CMEventHandler {
 
     private void processFileEvent(CMEvent cme)
     {
-        m_mainActivity.printMessageln("received a CM file event.");
+        CMFileEvent fe = (CMFileEvent) cme;
+        long lDelay = 0;
+
+        switch(fe.getID())
+        {
+            case CMFileEvent.REQUEST_FILE_TRANSFER:
+            case CMFileEvent.REQUEST_FILE_TRANSFER_CHAN:
+                m_mainActivity.printMessage("["+fe.getReceiverName()+"] requests file("+fe.getFileName()+").\n");
+                break;
+            case CMFileEvent.REPLY_FILE_TRANSFER:
+            case CMFileEvent.REPLY_FILE_TRANSFER_CHAN:
+                if(fe.getReturnCode() == 0)
+                {
+                    m_mainActivity.printMessage("["+fe.getFileName()+"] does not exist in the owner!\n");
+                }
+                break;
+            case CMFileEvent.START_FILE_TRANSFER:
+            case CMFileEvent.START_FILE_TRANSFER_CHAN:
+                m_mainActivity.printMessage("["+fe.getSenderName()+"] is about to send file("+fe.getFileName()+").\n");
+                break;
+            case CMFileEvent.END_FILE_TRANSFER:
+            case CMFileEvent.END_FILE_TRANSFER_CHAN:
+                m_mainActivity.printMessage("["+fe.getSenderName()+"] completes to send file("+fe.getFileName()+", "
+                        +fe.getFileSize()+" Bytes).\n");
+                lDelay = System.currentTimeMillis() - m_lStartTime;
+                m_mainActivity.printMessage("file-transfer delay: "+lDelay+" ms.\n");
+
+                if(m_bDistFileProc)
+                    processFile(fe.getFileName());
+                if(m_bReqAttachedFile)
+                {
+                    // need to be modified for Android platform
+                    /*
+                    CMConfigurationInfo confInfo = m_clientStub.getCMInfo().getConfigurationInfo();
+                    String strPath = confInfo.getTransferedFileHome().toString() + File.separator + fe.getFileName();
+                    File file = new File(strPath);
+                    try {
+                        Desktop.getDesktop().open(file);
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    */
+                    m_bReqAttachedFile = false;
+                }
+                break;
+            case CMFileEvent.CANCEL_FILE_SEND:
+            case CMFileEvent.CANCEL_FILE_SEND_CHAN:
+                m_mainActivity.printMessage("["+fe.getSenderName()+"] cancelled the file transfer.\n");
+                break;
+            case CMFileEvent.CANCEL_FILE_RECV_CHAN:
+                m_mainActivity.printMessage("["+fe.getReceiverName()+"] cancelled the file request.\n");
+                break;
+        }
+        return;
+    }
+
+    private void processFile(String strFile)
+    {
+        m_mainActivity.printMessage("Not yet supported in Android client!");
+        return;
     }
 
     private void processSNSEvent(CMEvent cme)

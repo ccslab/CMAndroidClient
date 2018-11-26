@@ -40,4 +40,11 @@
     <string name="remove_socket_channel">Remove Socket Channel</string>
     <string name="remove_datagram_channel">Remove Datagram Channel</string>
     <string name="remove_multicast_channel">Remove Multicast Channel</string>
+    <string name="file_name">File Name</string>
+    <string name="file_owner">File Owner</string>
+    <string name="default_server_name">SERVER</string>
+    <string name="file_append_mode">File Append Mode</string>
+    <string name="default_mode">default</string>
+    <string name="overwrite_mode">overwrite</string>
+    <string name="append_mode">append</string>
 </resources>

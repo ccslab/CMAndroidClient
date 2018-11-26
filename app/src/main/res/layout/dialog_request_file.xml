@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/fileNameTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/file_name" />
+
+    <EditText
+        android:id="@+id/fileNameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName" />
+
+    <TextView
+        android:id="@+id/fileOwnerTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/file_owner" />
+
+    <EditText
+        android:id="@+id/fileOwnerEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="@string/default_server_name" />
+
+    <TextView
+        android:id="@+id/appendModeTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/file_append_mode" />
+
+    <RadioGroup
+        android:id="@+id/appendModeRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="128dp">
+
+        <RadioButton
+            android:id="@+id/defaultRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="49dp"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="@string/default_mode" />
+
+        <RadioButton
+            android:id="@+id/overwriteRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="49dp"
+            android:layout_weight="1"
+            android:text="@string/overwrite_mode" />
+
+        <RadioButton
+            android:id="@+id/appendRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="49dp"
+            android:layout_weight="1"
+            android:text="@string/append_mode" />
+    </RadioGroup>
+</LinearLayout>
