@@ -1,7 +1,10 @@
 package com.example.mlim.cmclient;
 
 //import android.support.v4.app.DialogFragment;
+import android.app.Activity;
 import android.app.DialogFragment;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +20,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.file.Files;
@@ -50,13 +54,17 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         RemoveSocketChannelDialogFragment.RemoveSocketChannelDialogListener,
         RemoveDatagramChannelDialogFragment.RemoveDatagramChannelDialogListener,
         RemoveMulticastChannelDialogFragment.RemoveMulticastChannelDialogListener,
-        RequestFileDialogFragment.RequestFileDialogListener
+        RequestFileDialogFragment.RequestFileDialogListener,
+        PushFileDialogFragment.PushFileDialogListener
 {
 
     private CMClientStub m_cmClientStub;
     private CMClientEventHandler m_cmEventHandler;
+    private String m_strReceiver;
 
     public static final String EXTRA_MESSAGE = "com.example.mlim.CMClient.MESSAGE";
+    private static final int READ_REQUEST_CODE = 42;
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -245,9 +253,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 requestFile();
                 break;
             case "72": // push a file
-                // from here
-                printMessageln("Not supported yet!");
-                //pushFile();
+                pushFile();
                 break;
             case "73":	// test cancel receiving a file
                 printMessageln("Not supported yet!");
@@ -1359,5 +1365,90 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     {
         // nothing to do
     }
+    //////////
+
+    ////////// push file
+
+    public void pushFile()
+    {
+        printMessage("========== push file\n");
+        DialogFragment dialog = new PushFileDialogFragment();
+        dialog.show(getFragmentManager(), "PushFileDialogFragment");
+    }
+
+    public void onPushFileDialogConfirmClick(DialogFragment dialog)
+    {
+        EditText recvEditText = dialog.getView().findViewById(R.id.fileReceiverEditText);
+        m_strReceiver = recvEditText.getText().toString().trim();
+
+        // file selection with Storage Access Framework(SAF) since Android 4.4(API level 19)
+        performFileSearch();
+    }
+
+    /**
+     * Fires an intent to spin up the "file chooser" UI and select an image.
+     */
+    public void performFileSearch()
+    {
+        // ACTION_OPEN_DOCUMENT is the intent to choose a file via the system's file
+        // browser.
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+
+        // Filter to only show results that can be "opened", such as a
+        // file (as opposed to a list of contacts or timezones)
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        // Filter to show only images, using the image MIME data type.
+        // If one wanted to search for ogg vorbis files, the type would be "audio/ogg".
+        // To search for all documents available via installed storage providers,
+        // it would be "*/*".
+        intent.setType("image/*");
+
+        startActivityForResult(intent, READ_REQUEST_CODE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode,
+                                 Intent resultData) {
+
+        // The ACTION_OPEN_DOCUMENT intent was sent with the request code
+        // READ_REQUEST_CODE. If the request code seen here doesn't match, it's the
+        // response to some other intent, and the code below shouldn't run at all.
+
+        if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            // The document selected by the user won't be returned in the intent.
+            // Instead, a URI to that document will be contained in the return intent
+            // provided to this method as a parameter.
+            // Pull that URI using resultData.getData().
+            Uri uri = null;
+            if (resultData != null) {
+                uri = resultData.getData();
+                Log.i(TAG, "Uri: " + uri.toString());
+                Log.i(TAG, "file path from uri: "+uri.getPath());
+
+                // find real file path
+                String strFilePath = null;
+                try {
+                    strFilePath = PathUtil.getPath(getApplicationContext(), uri);
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+                Log.i(TAG, "found file path: "+strFilePath);
+                //showImage(uri);
+                //call pushFile of CM (from here)
+
+                boolean ret = m_cmClientStub.pushFile(strFilePath, m_strReceiver);
+                if(!ret)
+                    printMessage("file push error! receiver("+m_strReceiver
+                            +"), file path("+uri.getPath()+")");
+            }
+        }
+    }
+
+    public void onPushFileDialogCancelClick(DialogFragment dialog)
+    {
+        // nothing to do
+    }
+
     //////////
 }

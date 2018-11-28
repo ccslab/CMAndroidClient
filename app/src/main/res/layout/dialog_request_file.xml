@@ -5,6 +5,12 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/reqFileTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/request_file" />
+
+    <TextView
         android:id="@+id/fileNameTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

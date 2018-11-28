@@ -47,4 +47,7 @@
     <string name="default_mode">default</string>
     <string name="overwrite_mode">overwrite</string>
     <string name="append_mode">append</string>
+    <string name="push_file">Push File</string>
+    <string name="file_receiver">File Receiver</string>
+    <string name="request_file">Request File</string>
 </resources>
