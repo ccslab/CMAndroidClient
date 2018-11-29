@@ -55,7 +55,9 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         RemoveDatagramChannelDialogFragment.RemoveDatagramChannelDialogListener,
         RemoveMulticastChannelDialogFragment.RemoveMulticastChannelDialogListener,
         RequestFileDialogFragment.RequestFileDialogListener,
-        PushFileDialogFragment.PushFileDialogListener
+        PushFileDialogFragment.PushFileDialogListener,
+        MeasureInputThroughputDialogFragment.MeasureInputThroughputDialogListener,
+        MeasureOutputThroughputDialogFragment.MeasureOutputThroughputDialogListener
 {
 
     private CMClientStub m_cmClientStub;
@@ -221,12 +223,10 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 //printGroupInfoOfServer();
                 break;
             case "55": // test input network throughput
-                printMessageln("Not supported yet!");
-                //measureInputThroughput();
+                measureInputThroughput();
                 break;
             case "56": // test output network throughput
-                printMessageln("Not supported yet!");
-                //measureOutputThroughput();
+                measureOutputThroughput();
                 break;
             case "57": // print all configurations
                 printConfigurations();
@@ -1424,7 +1424,6 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
             if (resultData != null) {
                 uri = resultData.getData();
                 Log.i(TAG, "Uri: " + uri.toString());
-                Log.i(TAG, "file path from uri: "+uri.getPath());
 
                 // find real file path
                 String strFilePath = null;
@@ -1435,8 +1434,8 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 }
                 Log.i(TAG, "found file path: "+strFilePath);
                 //showImage(uri);
-                //call pushFile of CM (from here)
 
+                //call pushFile of CM
                 boolean ret = m_cmClientStub.pushFile(strFilePath, m_strReceiver);
                 if(!ret)
                     printMessage("file push error! receiver("+m_strReceiver
@@ -1450,5 +1449,74 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         // nothing to do
     }
 
+    //////////
+
+    ////////// measure network throughput
+
+    public void measureInputThroughput()
+    {
+        printMessage("========== measure input network throughput\n");
+        DialogFragment dialog = new MeasureInputThroughputDialogFragment();
+        dialog.show(getFragmentManager(), "MeasureInputThroughputDialogFragment");
+    }
+
+    public void onMeasureInputThroughputDialogConfirmClick(DialogFragment dialog)
+    {
+        String strTarget = null;
+        float fSpeed = -1;
+
+        EditText targetEditText = dialog.getView().findViewById(R.id.targetNodeEditText);
+        strTarget = targetEditText.getText().toString().trim();
+
+        if(strTarget == null)
+            return;
+        else if(strTarget.equals(""))
+            strTarget = "SERVER";
+
+        fSpeed = m_cmClientStub.measureInputThroughput(strTarget);
+        if(fSpeed == -1)
+            printMessage("Test failed!\n");
+        else
+            printMessage(String.format("Input network throughput from [%s] : %.2f MBps%n", strTarget, fSpeed));
+
+    }
+
+    public void onMeasureInputThroughputDialogCancelClick(DialogFragment dialog)
+    {
+        // nothing to do
+    }
+
+    public void measureOutputThroughput()
+    {
+        printMessage("========== measure output network throughput\n");
+        DialogFragment dialog = new MeasureOutputThroughputDialogFragment();
+        dialog.show(getFragmentManager(), "MeasureOutputThroughputDialogFragment");
+    }
+
+    public void onMeasureOutputThroughputDialogConfirmClick(DialogFragment dialog)
+    {
+        String strTarget = null;
+        float fSpeed = -1;
+
+        EditText targetEditText = dialog.getView().findViewById(R.id.targetNodeEditText);
+        strTarget = targetEditText.getText().toString().trim();
+
+        if(strTarget == null)
+            return;
+        else if(strTarget.equals(""))
+            strTarget = "SERVER";
+
+        fSpeed = m_cmClientStub.measureOutputThroughput(strTarget);
+        if(fSpeed == -1)
+            printMessage("Test failed!\n");
+        else
+            printMessage(String.format("Output network throughput to [%s] : %.2f MBps%n", strTarget, fSpeed));
+
+    }
+
+    public void onMeasureOutputThroughputDialogCancelClick(DialogFragment dialog)
+    {
+        // nothing to do
+    }
     //////////
 }

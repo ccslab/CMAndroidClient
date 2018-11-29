@@ -50,4 +50,7 @@
     <string name="push_file">Push File</string>
     <string name="file_receiver">File Receiver</string>
     <string name="request_file">Request File</string>
+    <string name="target_node">Target Node</string>
+    <string name="measure_input_throughput">Measure Input Network Throughput</string>
+    <string name="measure_output_throughput">Measure Output Network Throughput</string>
 </resources>
