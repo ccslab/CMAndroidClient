@@ -33,6 +33,7 @@ import kr.ac.konkuk.ccslab.cm.entity.CMGroup;
 import kr.ac.konkuk.ccslab.cm.entity.CMGroupInfo;
 import kr.ac.konkuk.ccslab.cm.entity.CMServer;
 import kr.ac.konkuk.ccslab.cm.entity.CMSession;
+import kr.ac.konkuk.ccslab.cm.entity.CMSessionInfo;
 import kr.ac.konkuk.ccslab.cm.entity.CMUser;
 import kr.ac.konkuk.ccslab.cm.event.CMSessionEvent;
 import kr.ac.konkuk.ccslab.cm.info.CMConfigurationInfo;
@@ -155,8 +156,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 requestSessionInfoDS();
                 break;
             case "21": // synchronously request session info from default server
-                printMessageln("Not supported yet!");
-                //syncSessionInfoDS();
+                syncSessionInfoDS();
                 break;
             case "22": // join a session
                 joinSession();
@@ -745,6 +745,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     {
         boolean bRequestResult = false;
         printMessage("====== request session info from default server\n");
+        m_cmEventHandler.setStartTime(System.currentTimeMillis());
         bRequestResult = m_cmClientStub.requestSessionInfo();
         if(bRequestResult)
         {
@@ -753,6 +754,37 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         else
         {
             printMessage("failed the session-info request!\n");
+        }
+
+    }
+
+    private void syncSessionInfoDS()
+    {
+        CMSessionEvent se = null;
+        printMessage("====== synchronous request session info from default server\n");
+        m_cmEventHandler.setStartTime(System.currentTimeMillis());
+        se = m_cmClientStub.syncRequestSessionInfo();
+        long lDelay = System.currentTimeMillis() - m_cmEventHandler.getStartTime();
+        if(se == null)
+        {
+            printMessage("failed the session-info request!\n");
+            return;
+        }
+
+        printMessage("return delay: "+ lDelay +" ms.\n");
+
+        // print the request result
+        Iterator<CMSessionInfo> iter = se.getSessionInfoList().iterator();
+
+        printMessage(String.format("%-60s%n", "------------------------------------------------------------"));
+        printMessage(String.format("%-20s%-20s%-10s%-10s%n", "name", "address", "port", "user num"));
+        printMessage(String.format("%-60s%n", "------------------------------------------------------------"));
+
+        while(iter.hasNext())
+        {
+            CMSessionInfo tInfo = iter.next();
+            printMessage(String.format("%-20s%-20s%-10d%-10d%n", tInfo.getSessionName(), tInfo.getAddress(),
+                    tInfo.getPort(), tInfo.getUserNum()));
         }
 
     }

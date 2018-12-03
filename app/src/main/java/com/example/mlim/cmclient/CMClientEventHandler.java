@@ -107,7 +107,7 @@ public class CMClientEventHandler implements CMEventHandler {
 
     private void processSessionEvent(CMEvent cme)
     {
-        //long lDelay = 0;
+        long lDelay = 0;
         CMSessionEvent se = (CMSessionEvent)cme;
         switch(se.getID())
         {
@@ -136,8 +136,8 @@ public class CMClientEventHandler implements CMEventHandler {
                 }
                 break;
             case CMSessionEvent.RESPONSE_SESSION_INFO:
-                //lDelay = System.currentTimeMillis() - m_lStartTime;
-                //printMessage("RESPONSE_SESSION_INFO delay: "+lDelay+" ms.\n");
+                lDelay = System.currentTimeMillis() - m_lStartTime;
+                m_mainActivity.printMessage("RESPONSE_SESSION_INFO delay: "+lDelay+" ms.\n");
                 processRESPONSE_SESSION_INFO(se);
                 break;
             case CMSessionEvent.SESSION_TALK:
