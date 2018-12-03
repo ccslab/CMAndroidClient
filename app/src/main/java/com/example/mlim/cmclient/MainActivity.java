@@ -34,6 +34,7 @@ import kr.ac.konkuk.ccslab.cm.entity.CMGroupInfo;
 import kr.ac.konkuk.ccslab.cm.entity.CMServer;
 import kr.ac.konkuk.ccslab.cm.entity.CMSession;
 import kr.ac.konkuk.ccslab.cm.entity.CMUser;
+import kr.ac.konkuk.ccslab.cm.event.CMSessionEvent;
 import kr.ac.konkuk.ccslab.cm.info.CMConfigurationInfo;
 import kr.ac.konkuk.ccslab.cm.info.CMInfo;
 import kr.ac.konkuk.ccslab.cm.info.CMInteractionInfo;
@@ -43,6 +44,7 @@ import kr.ac.konkuk.ccslab.cm.util.CMUtil;
 
 public class MainActivity extends AppCompatActivity implements ServerInfoDialogFragment.ServerInfoDialogListener,
         LoginDSDialogFragment.LoginDSDialogListener,
+        SyncLoginDSDialogFragment.SyncLoginDSDialogListener,
         JoinSessionDialogFragment.JoinSessionDialogListener,
         ChangeGroupDialogFragment.ChangeGroupDialogListener,
         ChatDialogFragment.ChatDialogListener,
@@ -136,8 +138,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 loginDS();
                 break;
             case "11": // synchronously login to default server
-                printMessageln("Not supported yet!");
-                //syncLoginDS();
+                syncLoginDS();
                 break;
             case "12": // logout from default server
                 logoutDS();
@@ -396,6 +397,18 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     }
 
+    public void setActivityTitle(String title)
+    {
+        final Activity activity = this;
+        final String strTitle = title;
+        runOnUiThread(new Runnable() {
+           public void run()
+           {
+               activity.setTitle(strTitle);
+           }
+        });
+    }
+
     // Checks if external storage is available for read and write
     public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
@@ -612,16 +625,17 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
             printMessage("Error while disconnecting from the default server!");
         }
         printMessage("======\n");
+        setActivityTitle(getString(R.string.app_name));
     }
     //////////
 
     ////////// login
     private void loginDS()
     {
+        printMessage("====== login to default server\n");
         // Create an instance of the dialog fragment and show it
         DialogFragment dialog = new LoginDSDialogFragment();
         dialog.show(getFragmentManager(), "LoginDSDialogFragment");
-
     }
 
     public void onLoginDSDialogConfirmClick(DialogFragment dialog)
@@ -648,6 +662,64 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     {
         // nothing to do
     }
+
+    private void syncLoginDS()
+    {
+        printMessage("====== synchronously login to default server\n");
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new SyncLoginDSDialogFragment();
+        dialog.show(getFragmentManager(), "SyncLoginDSDialogFragment");
+    }
+
+    public void onSyncLoginDSDialogConfirmClick(DialogFragment dialog)
+    {
+        EditText idEditText = dialog.getView().findViewById(R.id.loginDSIDEditText);
+        EditText passwdEditText = dialog.getView().findViewById(R.id.loginDSPasswdEditText);
+        String strUserName = idEditText.getText().toString().trim();
+        String strPasswd = passwdEditText.getText().toString();
+        String strEncPassword = CMUtil.getSHA1Hash(strPasswd);
+        CMSessionEvent loginAckEvent = null;
+
+        m_cmEventHandler.setStartTime(System.currentTimeMillis());
+        loginAckEvent = m_cmClientStub.syncLoginCM(strUserName, strEncPassword);
+        long lDelay = System.currentTimeMillis() - m_cmEventHandler.getStartTime();
+        if(loginAckEvent != null)
+        {
+            // print login result
+            if(loginAckEvent.isValidUser() == 0)
+            {
+                printMessage("This client fails authentication by the default server!\n");
+                toastMessage("사용자 인증 실패!", Toast.LENGTH_SHORT);
+            }
+            else if(loginAckEvent.isValidUser() == -1)
+            {
+                printMessage("This client is already in the login-user list!\n");
+                toastMessage("이미 로그인중!", Toast.LENGTH_SHORT);
+            }
+            else
+            {
+                printMessage("return delay: "+lDelay+" ms.\n");
+                printMessage("This client successfully logs in to the default server.\n");
+                toastMessage("로그인 성공!", Toast.LENGTH_SHORT);
+
+                CMInteractionInfo interInfo = m_cmClientStub.getCMInfo().getInteractionInfo();
+
+                // Change the title of the client window
+                setActivityTitle(getString(R.string.app_name)+" ["+interInfo.getMyself().getName()+"]");
+            }
+        }
+        else
+        {
+            printMessage("failed the login request!\n");
+        }
+
+    }
+
+    public void onSyncLoginDSDialogCancelClick(DialogFragment dialog)
+    {
+        // nothing to do
+    }
+
     //////////
 
     ////////// logout
@@ -663,6 +735,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         else {
             printMessage("failed the logout request!\n");
         }
+        setActivityTitle(getString(R.string.app_name));
 
     }
     //////////

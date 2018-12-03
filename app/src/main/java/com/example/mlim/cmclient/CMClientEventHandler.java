@@ -15,6 +15,7 @@ import kr.ac.konkuk.ccslab.cm.event.CMInterestEvent;
 import kr.ac.konkuk.ccslab.cm.event.CMSessionEvent;
 import kr.ac.konkuk.ccslab.cm.info.CMConfigurationInfo;
 import kr.ac.konkuk.ccslab.cm.info.CMInfo;
+import kr.ac.konkuk.ccslab.cm.info.CMInteractionInfo;
 import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 
 public class CMClientEventHandler implements CMEventHandler {
@@ -127,15 +128,11 @@ public class CMClientEventHandler implements CMEventHandler {
                 {
                     m_mainActivity.printMessage("This client successfully logs in to the default server.\n");
                     m_mainActivity.toastMessage("로그인 성공!", Toast.LENGTH_SHORT);
-                    /*
                     CMInteractionInfo interInfo = m_clientStub.getCMInfo().getInteractionInfo();
 
                     // Change the title of the client window
-                    m_client.setTitle("CM Client ["+interInfo.getMyself().getName()+"]");
-
-                    // Set the appearance of buttons in the client frame window
-                    m_client.setButtonsAccordingToClientState();
-                    */
+                    m_mainActivity.setActivityTitle(m_mainActivity.getString(R.string.app_name)+
+                            " ["+interInfo.getMyself().getName()+"]");
                 }
                 break;
             case CMSessionEvent.RESPONSE_SESSION_INFO:
