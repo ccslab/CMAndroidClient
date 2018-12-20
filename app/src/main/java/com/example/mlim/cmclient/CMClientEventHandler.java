@@ -232,6 +232,7 @@ public class CMClientEventHandler implements CMEventHandler {
                 m_client.setTitle("CM Client");
                 */
                 m_mainActivity.printMessageln("Unexpected disconnection from the default server!");
+                m_mainActivity.setActivityTitle("CM Client");
                 break;
             default:
                 return;
