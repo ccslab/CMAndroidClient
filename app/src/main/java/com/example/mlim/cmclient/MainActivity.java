@@ -139,7 +139,8 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 loginDS();
                 break;
             case "11": // synchronously login to default server
-                syncLoginDS();
+                printMessageln("Not supported yet!");
+                //syncLoginDS();
                 break;
             case "12": // logout from default server
                 logoutDS();
@@ -156,7 +157,8 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 requestSessionInfoDS();
                 break;
             case "21": // synchronously request session info from default server
-                syncSessionInfoDS();
+                printMessageln("Not supported yet!");
+                //syncSessionInfoDS();
                 break;
             case "22": // join a session
                 joinSession();
@@ -266,16 +268,10 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 //setFilePath();
                 break;
             case "71": // request a file
-                printMessageln("Not supported yet!");
-                printMessageln("worked find in version 3.2.1, but ");
-                printMessageln("need to update for Android Studio version 3.3.2");
-                //requestFile();
+                requestFile();
                 break;
             case "72": // push a file
-                printMessageln("Not supported yet!");
-                printMessageln("worked find in version 3.2.1, but ");
-                printMessageln("need to update for Android Studio version 3.3.2");
-                //pushFile();
+                pushFile();
                 break;
             case "73":	// test cancel receiving a file
                 printMessageln("Not supported yet!");
