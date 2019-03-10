@@ -139,8 +139,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 loginDS();
                 break;
             case "11": // synchronously login to default server
-                printMessageln("Not supported yet!");
-                //syncLoginDS();
+                syncLoginDS();
                 break;
             case "12": // logout from default server
                 logoutDS();
@@ -157,8 +156,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 requestSessionInfoDS();
                 break;
             case "21": // synchronously request session info from default server
-                printMessageln("Not supported yet!");
-                //syncSessionInfoDS();
+                syncSessionInfoDS();
                 break;
             case "22": // join a session
                 joinSession();
@@ -235,16 +233,10 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 //printGroupInfoOfServer();
                 break;
             case "55": // test input network throughput
-                printMessageln("Not supported yet!");
-                printMessageln("worked find in version 3.2.1, but ");
-                printMessageln("need to update for Android Studio version 3.3.2");
-                //measureInputThroughput();
+                measureInputThroughput();
                 break;
             case "56": // test output network throughput
-                printMessageln("Not supported yet!");
-                printMessageln("worked find in version 3.2.1, but ");
-                printMessageln("need to update for Android Studio version 3.3.2");
-                //measureOutputThroughput();
+                measureOutputThroughput();
                 break;
             case "57": // print all configurations
                 printConfigurations();

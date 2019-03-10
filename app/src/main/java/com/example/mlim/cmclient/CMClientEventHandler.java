@@ -8,11 +8,14 @@ import java.util.Iterator;
 
 import kr.ac.konkuk.ccslab.cm.entity.CMSessionInfo;
 import kr.ac.konkuk.ccslab.cm.event.CMDataEvent;
+import kr.ac.konkuk.ccslab.cm.event.CMDummyEvent;
 import kr.ac.konkuk.ccslab.cm.event.CMEvent;
 import kr.ac.konkuk.ccslab.cm.event.CMEventHandler;
 import kr.ac.konkuk.ccslab.cm.event.CMFileEvent;
 import kr.ac.konkuk.ccslab.cm.event.CMInterestEvent;
 import kr.ac.konkuk.ccslab.cm.event.CMSessionEvent;
+import kr.ac.konkuk.ccslab.cm.event.CMUserEvent;
+import kr.ac.konkuk.ccslab.cm.event.CMUserEventField;
 import kr.ac.konkuk.ccslab.cm.info.CMConfigurationInfo;
 import kr.ac.konkuk.ccslab.cm.info.CMInfo;
 import kr.ac.konkuk.ccslab.cm.info.CMInteractionInfo;
@@ -25,6 +28,7 @@ public class CMClientEventHandler implements CMEventHandler {
     private long m_lStartTime;
     private boolean m_bDistFileProc;
     private boolean m_bReqAttachedFile;
+    private long m_lDelaySum;
 
     CMClientEventHandler(CMClientStub clientStub, MainActivity activity)
     {
@@ -33,6 +37,7 @@ public class CMClientEventHandler implements CMEventHandler {
         m_lStartTime = 0;
         m_bDistFileProc = false;
         m_bReqAttachedFile = false;
+        m_lDelaySum = 0;
     }
 
     // event handling method
@@ -294,7 +299,118 @@ public class CMClientEventHandler implements CMEventHandler {
 
     private void processUserEvent(CMEvent cme)
     {
-        m_mainActivity.printMessageln("received a CM user event.");
+        int id = -1;
+        long lSendTime = 0;
+        int nSendNum = 0;
+
+        CMUserEvent ue = (CMUserEvent) cme;
+
+        if(ue.getStringID().equals("testForward"))
+        {
+            id = Integer.parseInt(ue.getEventField(CMInfo.CM_INT, "id"));
+            m_mainActivity.printMessage("Received user event \'testForward\', id: "+id+"\n");
+        }
+        else if(ue.getStringID().equals("testNotForward"))
+        {
+            id = Integer.parseInt(ue.getEventField(CMInfo.CM_INT, "id"));
+            m_mainActivity.printMessage("Received user event 'testNotForward', id("+id+")\n");
+        }
+        else if(ue.getStringID().equals("testForwardDelay"))
+        {
+            id = Integer.parseInt(ue.getEventField(CMInfo.CM_INT, "id"));
+            lSendTime = Long.parseLong(ue.getEventField(CMInfo.CM_LONG, "stime"));
+            long lDelay = System.currentTimeMillis() - lSendTime;
+            m_lDelaySum += lDelay;
+            m_mainActivity.printMessage("Received user event 'testNotForward', id("+id+"), delay("+lDelay+"), delay_sum("+m_lDelaySum+")\n");
+        }
+        else if(ue.getStringID().equals("EndForwardDelay"))
+        {
+            nSendNum = Integer.parseInt(ue.getEventField(CMInfo.CM_INT, "sendnum"));
+            m_mainActivity.printMessage("Received user envet 'EndForwardDelay', avg delay("+m_lDelaySum/nSendNum+" ms)\n");
+            m_lDelaySum = 0;
+        }
+        else if(ue.getStringID().equals("repRecv"))
+        {
+            String strReceiver = ue.getEventField(CMInfo.CM_STR, "receiver");
+            int nBlockingChannelType = Integer.parseInt(ue.getEventField(CMInfo.CM_INT, "chType"));
+            int nBlockingChannelKey = Integer.parseInt(ue.getEventField(CMInfo.CM_INT, "chKey"));
+            int nRecvPort = Integer.parseInt(ue.getEventField(CMInfo.CM_INT, "recvPort"));
+            int opt = -1;
+            if(nBlockingChannelType == CMInfo.CM_SOCKET_CHANNEL)
+                opt = CMInfo.CM_STREAM;
+            else if(nBlockingChannelType == CMInfo.CM_DATAGRAM_CHANNEL)
+                opt = CMInfo.CM_DATAGRAM;
+
+            CMDummyEvent due = new CMDummyEvent();
+            due.setDummyInfo("This is a test message to test a blocking channel");
+            System.out.println("Sending a dummy event to ("+strReceiver+")..");
+
+            if(opt == CMInfo.CM_STREAM)
+                m_clientStub.send(due, strReceiver, opt, nBlockingChannelKey, true);
+            else if(opt == CMInfo.CM_DATAGRAM)
+                m_clientStub.send(due, strReceiver, opt, nBlockingChannelKey, nRecvPort, true);
+            else
+                System.err.println("invalid sending option!: "+opt);
+        }
+        else if(ue.getStringID().equals("testSendRecv"))
+        {
+            m_mainActivity.printMessage("Received user event from ["+ue.getSender()+"] to ["+ue.getReceiver()+
+                    "], (id, "+ue.getID()+"), (string id, "+ue.getStringID()+")\n");
+
+            if(!m_clientStub.getMyself().getName().equals(ue.getReceiver()))
+                return;
+
+            CMUserEvent rue = new CMUserEvent();
+            rue.setID(222);
+            rue.setStringID("testReplySendRecv");
+            boolean ret = m_clientStub.send(rue, ue.getSender());
+            if(ret)
+                m_mainActivity.printMessage("Sent reply event: (id, "+rue.getID()+"), (string id, "+rue.getStringID()+")\n");
+            else
+                m_mainActivity.printMessage("Failed to send the reply event!\n");
+        }
+        else if(ue.getStringID().equals("testCastRecv"))
+        {
+            m_mainActivity.printMessage("Received user event from ["+ue.getSender()+"], to session["+
+                    ue.getEventField(CMInfo.CM_STR, "Target Session")+"] and group["+
+                    ue.getEventField(CMInfo.CM_STR,  "Target Group")+"], (id, "+ue.getID()+
+                    "), (string id, "+ue.getStringID()+")\n");
+            CMUserEvent rue = new CMUserEvent();
+            rue.setID(223);
+            rue.setStringID("testReplyCastRecv");
+            boolean ret = m_clientStub.send(rue, ue.getSender());
+            if(ret)
+                m_mainActivity.printMessage("Sent reply event: (id, "+rue.getID()+"), (sting id, "+rue.getStringID()+")\n");
+            else
+                m_mainActivity.printMessage("Failed to send the reply event!\n");
+        }
+        else
+        {
+            m_mainActivity.printMessage("CMUserEvent received from ["+ue.getSender()+"], strID("+ue.getStringID()+")\n");
+            m_mainActivity.printMessage(String.format("%-5s%-20s%-10s%-20s%n", "Type", "Field", "Length", "Value"));
+            m_mainActivity.printMessage("-----------------------------------------------------\n");
+            Iterator<CMUserEventField> iter = ue.getAllEventFields().iterator();
+            while(iter.hasNext())
+            {
+                CMUserEventField uef = iter.next();
+                if(uef.nDataType == CMInfo.CM_BYTES)
+                {
+                    m_mainActivity.printMessage(String.format("%-5s%-20s%-10d", uef.nDataType, uef.strFieldName,
+                            uef.nValueByteNum));
+                    for(int i = 0; i < uef.nValueByteNum; i++)
+                    {
+                        //not yet
+                    }
+                    m_mainActivity.printMessage("\n");
+                }
+                else
+                {
+                    m_mainActivity.printMessage(String.format("%-5d%-20s%-10d%-20s%n", uef.nDataType, uef.strFieldName,
+                            uef.strFieldValue.length(), uef.strFieldValue));
+                }
+            }
+        }
+        return;
     }
 
     private void processFileEvent(CMEvent cme)
