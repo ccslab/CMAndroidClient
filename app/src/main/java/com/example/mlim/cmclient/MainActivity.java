@@ -191,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 //multicastChat();
                 break;
             case "42": // test CMDummyEvent
+                //from here
                 printMessageln("Not supported yet!");
                 //testDummyEvent();
                 break;
@@ -205,6 +206,14 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
             case "45": // user position
                 printMessageln("Not supported yet!");
                 //testUserPosition();
+                break;
+            case "46": // test sendrecv
+                printMessageln("Not supported yet!");
+                //testSendRecv();
+                break;
+            case "47": // test castrecv
+                printMessageln("Not supported yet!");
+                //testCastRecv();
                 break;
             case "50": // print group info
                 printGroupInfo();
@@ -224,10 +233,16 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 //printGroupInfoOfServer();
                 break;
             case "55": // test input network throughput
-                measureInputThroughput();
+                printMessageln("Not supported yet!");
+                printMessageln("worked find in version 3.2.1, but ");
+                printMessageln("need to update for Android Studio version 3.3.2");
+                //measureInputThroughput();
                 break;
             case "56": // test output network throughput
-                measureOutputThroughput();
+                printMessageln("Not supported yet!");
+                printMessageln("worked find in version 3.2.1, but ");
+                printMessageln("need to update for Android Studio version 3.3.2");
+                //measureOutputThroughput();
                 break;
             case "57": // print all configurations
                 printConfigurations();
@@ -251,10 +266,16 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
                 //setFilePath();
                 break;
             case "71": // request a file
-                requestFile();
+                printMessageln("Not supported yet!");
+                printMessageln("worked find in version 3.2.1, but ");
+                printMessageln("need to update for Android Studio version 3.3.2");
+                //requestFile();
                 break;
             case "72": // push a file
-                pushFile();
+                printMessageln("Not supported yet!");
+                printMessageln("worked find in version 3.2.1, but ");
+                printMessageln("need to update for Android Studio version 3.3.2");
+                //pushFile();
                 break;
             case "73":	// test cancel receiving a file
                 printMessageln("Not supported yet!");
@@ -560,6 +581,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         printMessage("---------------------------------- Event Transmission\n");
         printMessage("40: chat, 41: multicast chat in current group\n");
         printMessage("42: test CMDummyEvent, 43: test CMUserEvent, 44: test datagram event, 45: test user position\n");
+        printMessage("46: test sendrecv, 47: test castrecv\n");
         printMessage("---------------------------------- Information\n");
         printMessage("50: show group information of default server, 51: show current user status\n");
         printMessage("52: show current channels, 53: show current server information\n");
