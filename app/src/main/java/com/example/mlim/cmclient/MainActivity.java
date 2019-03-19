@@ -654,9 +654,8 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         EditText passwdEditText = dialog.getView().findViewById(R.id.loginDSPasswdEditText);
         String strID = idEditText.getText().toString().trim();
         String strPasswd = passwdEditText.getText().toString();
-        String strEncPasswd = CMUtil.getSHA1Hash(strPasswd);
 
-        boolean bRequestResult = m_cmClientStub.loginCM(strID, strEncPasswd);
+        boolean bRequestResult = m_cmClientStub.loginCM(strID, strPasswd);
         if(bRequestResult)
         {
             printMessage("successfully sent the login request.\n");
@@ -687,11 +686,10 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         EditText passwdEditText = dialog.getView().findViewById(R.id.loginDSPasswdEditText);
         String strUserName = idEditText.getText().toString().trim();
         String strPasswd = passwdEditText.getText().toString();
-        String strEncPassword = CMUtil.getSHA1Hash(strPasswd);
         CMSessionEvent loginAckEvent = null;
 
         m_cmEventHandler.setStartTime(System.currentTimeMillis());
-        loginAckEvent = m_cmClientStub.syncLoginCM(strUserName, strEncPassword);
+        loginAckEvent = m_cmClientStub.syncLoginCM(strUserName, strPasswd);
         long lDelay = System.currentTimeMillis() - m_cmEventHandler.getStartTime();
         if(loginAckEvent != null)
         {
