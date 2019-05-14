@@ -2,6 +2,7 @@ package com.example.mlim.cmclient;
 
 //import android.support.v4.app.DialogFragment;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Intent;
 import android.net.Uri;
@@ -11,7 +12,11 @@ import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -44,7 +49,6 @@ import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 import kr.ac.konkuk.ccslab.cm.util.CMUtil;
 
 public class MainActivity extends AppCompatActivity implements ServerInfoDialogFragment.ServerInfoDialogListener,
-        LoginDSDialogFragment.LoginDSDialogListener,
         SyncLoginDSDialogFragment.SyncLoginDSDialogListener,
         JoinSessionDialogFragment.JoinSessionDialogListener,
         ChangeGroupDialogFragment.ChangeGroupDialogListener,
@@ -67,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     private CMClientEventHandler m_cmEventHandler;
     private String m_strReceiver;
 
+    private Dialog m_loginDSDialog;
+
     public static final String EXTRA_MESSAGE = "com.example.mlim.CMClient.MESSAGE";
     private static final int READ_REQUEST_CODE = 42;
     private static final String TAG = "MainActivity";
@@ -75,6 +81,9 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // initialize dialogs
+        m_loginDSDialog = null;
 
         // initialize the cmTextView
         TextView cmTextView = (TextView) findViewById(R.id.cmTextView);
@@ -103,6 +112,30 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         checkUpdateServerInfo();
 
         // CM will start after the user presses the confirm button of the server-info dialog.
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.cm_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch(item.getItemId())
+        {
+            case R.id.menuShowAllMenus:
+                printAllMenus();
+                return true;
+            case R.id.menuLoginDS:
+                loginDS();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /** Called when the user taps the Enter button or types the enter key */
@@ -643,15 +676,20 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     private void loginDS()
     {
         printMessage("====== login to default server\n");
-        // Create an instance of the dialog fragment and show it
-        DialogFragment dialog = new LoginDSDialogFragment();
-        dialog.show(getFragmentManager(), "LoginDSDialogFragment");
+        m_loginDSDialog = new Dialog(this);
+        m_loginDSDialog.setContentView(R.layout.dialog_login_ds);
+        m_loginDSDialog.setTitle("Login to Default Server");
+
+        Button loginButton = (Button) m_loginDSDialog.findViewById(R.id.loginButton);
+        Button cancelButton = (Button) m_loginDSDialog.findViewById(R.id.cancelButton);
+
+        m_loginDSDialog.show();
     }
 
-    public void onLoginDSDialogConfirmClick(DialogFragment dialog)
+    public void onClickLogin(View v)
     {
-        EditText idEditText = dialog.getView().findViewById(R.id.loginDSIDEditText);
-        EditText passwdEditText = dialog.getView().findViewById(R.id.loginDSPasswdEditText);
+        EditText idEditText = m_loginDSDialog.findViewById(R.id.loginDSIDEditText);
+        EditText passwdEditText = m_loginDSDialog.findViewById(R.id.loginDSPasswdEditText);
         String strID = idEditText.getText().toString().trim();
         String strPasswd = passwdEditText.getText().toString();
 
@@ -665,11 +703,13 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
             printMessage("failed the login request!\n");
         }
 
+        m_loginDSDialog.dismiss();
     }
 
-    public void onLoginDSDialogCancelClick(DialogFragment dialog)
+    public void onCancelLogin(View v)
     {
-        // nothing to do
+        printMessage("login canceled.\n");
+        m_loginDSDialog.dismiss();
     }
 
     private void syncLoginDS()

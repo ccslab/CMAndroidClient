@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menuHelp"
+        android:title="@string/help" >
+        <menu >
+            <item
+                android:id="@+id/menuShowAllMenus"
+                android:title="@string/show_all_menus" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menuLogin"
+        android:title="@string/login" >
+        <menu >
+            <item
+                android:id="@+id/menuLoginDS"
+                android:title="@string/login_ds_title" />
+        </menu>
+    </item>
+</menu>

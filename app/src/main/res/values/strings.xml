@@ -1,4 +1,7 @@
 <resources>
+    <string name="help">Help</string>
+    <string name="show_all_menus">Show all menus</string>
+    <string name="login">Login</string>
     <string name="app_name">CMClient</string>
     <string name="edit_command">Type \"0\" for all commands.</string>
     <string name="button_enter">Enter</string>
