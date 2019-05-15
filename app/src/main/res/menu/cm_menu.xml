@@ -11,12 +11,243 @@
         </menu>
     </item>
     <item
-        android:id="@+id/menuLogin"
-        android:title="@string/login" >
+        android:id="@+id/menuStartStop"
+        android:title="@string/start_stop" >
         <menu >
             <item
-                android:id="@+id/menuLoginDS"
-                android:title="@string/login_ds_title" />
+                android:id="@+id/menuStartCM"
+                android:title="@string/start_cm" />
+            <item
+                android:id="@+id/menuTerminateCM"
+                android:title="@string/terminate_cm" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menuConnection"
+        android:title="@string/connection" >
+        <menu >
+            <item
+                android:id="@+id/menuConnDefServer"
+                android:title="@string/connect_default_server" />
+            <item
+                android:id="@+id/menuDisconDefServer"
+                android:title="@string/disconnect_default_server" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menuLoginLogout"
+        android:title="@string/login_logout">
+        <menu>
+            <item
+                android:id="@+id/menuLoginDefServer"
+                android:title="@string/login_default_server" />
+            <item
+                android:id="@+id/menuSyncLoginDefServer"
+                android:title="@string/sync_login_default_server" />
+            <item
+                android:id="@+id/menuLogoutDefServer"
+                android:title="@string/logout_default_server" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menuSessionGroup"
+        android:title="@string/session_group" >
+        <menu >
+            <item
+                android:id="@+id/menuReqSessionInfoDefServer"
+                android:title="@string/sync_req_session_info_default_server" />
+            <item
+                android:id="@+id/menuSyncReqSessionInfoDefServer"
+                android:title="@string/sync_req_session_info_default_server" />
+            <item
+                android:id="@+id/menuJoinSessionDefServer"
+                android:title="@string/sync_join_session_default_server" />
+            <item
+                android:id="@+id/menuSyncJoinSessionDefServer"
+                android:title="@string/sync_join_session_default_server" />
+            <item
+                android:id="@+id/menuLeaveSessionDefServer"
+                android:title="@string/leave_session_desig_server" />
+            <item
+                android:id="@+id/menuChangeGroupDefServer"
+                android:title="@string/change_group_default_server" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menuEventTransmission"
+        android:title="@string/event_transmission" >
+        <menu >
+            <item
+                android:id="@+id/menuChat"
+                android:title="@string/chat" />
+            <item
+                android:id="@+id/menuMulticastChat"
+                android:title="@string/multicast_chat_cur_group" />
+            <item
+                android:id="@+id/menuTestDummyEvent"
+                android:title="@string/test_dummy_event" />
+            <item
+                android:id="@+id/menuTestUserEvent"
+                android:title="@string/test_user_event" />
+            <item
+                android:id="@+id/menuTestDatagram"
+                android:title="@string/test_datagram" />
+            <item
+                android:id="@+id/menuTestUserPos"
+                android:title="@string/test_user_pos" />
+            <item
+                android:id="@+id/menuSendRecv"
+                android:title="@string/test_sendrecv" />
+            <item
+                android:id="@+id/menuCastRecv"
+                android:title="@string/test_castrecv" />
+            <item
+                android:id="@+id/menuAsyncSendRecv"
+                android:title="@string/test_async_sendrecv" />
+            <item
+                android:id="@+id/menuAsyncCastRecv"
+                android:title="@string/test_async_castrecv" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menuInformation"
+        android:title="@string/info" >
+        <menu >
+            <item
+                android:id="@+id/menuShowGroupInfo"
+                android:title="@string/show_group_info_default_server" />
+            <item
+                android:id="@+id/menuShowCurUserStat"
+                android:title="@string/show_cur_user_stat" />
+            <item
+                android:id="@+id/menuShowCurChannels"
+                android:title="@string/show_cur_channels" />
+            <item
+                android:id="@+id/menuInputThroughput"
+                android:title="@string/measure_input_throughput" />
+            <item
+                android:id="@+id/menuOutputThroughput"
+                android:title="@string/measure_output_throughput" />
+            <item
+                android:id="@+id/menuShowAllConfig"
+                android:title="@string/show_all_config" />
+            <item
+                android:id="@+id/menuChangeConfig"
+                android:title="@string/change_config" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menuChannel"
+        android:title="@string/channel" >
+        <menu >
+            <item
+                android:id="@+id/menuAddChannel"
+                android:title="@string/add_channel" />
+            <item
+                android:id="@+id/menuRemoveChannel"
+                android:title="@string/remove_channel" />
+            <item
+                android:id="@+id/menuTestBlockChannel"
+                android:title="@string/test_block_channel" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menuFileTransfer"
+        android:title="@string/file_transfer" >
+        <menu >
+            <item
+                android:id="@+id/menuSetFilePath"
+                android:title="@string/set_file_path" />
+            <item
+                android:id="@+id/menuReqFile"
+                android:title="@string/req_file" />
+            <item
+                android:id="@+id/menuPushFile"
+                android:title="@string/push_file" />
+            <item
+                android:id="@+id/menuCancelRecvFile"
+                android:title="@string/cancel_recv_file" />
+            <item
+                android:id="@+id/menuCancelSendFile"
+                android:title="@string/cancel_send_file" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menuSNS"
+        android:title="@string/sns" >
+        <menu >
+            <item
+                android:id="@+id/menuReqContentList"
+                android:title="@string/req_content_list" />
+            <item
+                android:id="@+id/menuReqNextContentList"
+                android:title="@string/req_next_content_list" />
+            <item
+                android:id="@+id/menuReqPrevContentList"
+                android:title="@string/req_prev_content_list" />
+            <item
+                android:id="@+id/menuReqAttachFile"
+                android:title="@string/req_attach_file" />
+            <item
+                android:id="@+id/menuUploadContent"
+                android:title="@string/upload_content" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menuUser"
+        android:title="@string/user" >
+        <menu >
+            <item
+                android:id="@+id/menuRegNewUser"
+                android:title="@string/reg_new_user" />
+            <item
+                android:id="@+id/menuDeregUser"
+                android:title="@string/dereg_user" />
+            <item
+                android:id="@+id/menuFindRegUser"
+                android:title="@string/find_reg_user" />
+            <item
+                android:id="@+id/menuAddNewFriend"
+                android:title="@string/add_new_friend" />
+            <item
+                android:id="@+id/menuRemoveFriend"
+                android:title="@string/remove_friend" />
+            <item
+                android:id="@+id/menuShowFriends"
+                android:title="@string/show_friends" />
+            <item
+                android:id="@+id/menuShowFriendRequesters"
+                android:title="@string/show_friend_requesters" />
+            <item
+                android:id="@+id/menuShowBiFriends"
+                android:title="@string/show_bi_friends" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menuOtherCMTest"
+        android:title="@string/other_cm_test" >
+        <menu >
+            <item
+                android:id="@+id/menuTestForwardScheme"
+                android:title="@string/test_forward_scheme" />
+            <item
+                android:id="@+id/menuTestDelayForwardScheme"
+                android:title="@string/test_delay_forward_scheme" />
+            <item
+                android:id="@+id/menuRepeatSNSRequest"
+                android:title="@string/test_repeat_req_sns_content" />
+            <item
+                android:id="@+id/menuPullPushMultipleFiles"
+                android:title="@string/pull_push_multiple_files" />
+            <item
+                android:id="@+id/menuSplitFile"
+                android:title="@string/split_file" />
+            <item
+                android:id="@+id/menuMergeFiles"
+                android:title="@string/merge_files" />
+            <item
+                android:id="@+id/menuDistMergeFile"
+                android:title="@string/dist_merge_files" />
         </menu>
     </item>
 </menu>

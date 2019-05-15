@@ -128,10 +128,84 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         switch(item.getItemId())
         {
             case R.id.menuShowAllMenus:
-                printAllMenus();
+                printAllMenus(); return true;
+            case R.id.menuStartCM:
+                checkUpdateServerInfo(); return true;
+            case R.id.menuTerminateCM:
+                terminateCM(); return true;
+            case R.id.menuConnDefServer:
+                connectToDS(); return true;
+            case R.id.menuDisconDefServer:
+                disconnectFromDS(); return true;
+            case R.id.menuLoginDefServer:
+                loginDS(); return true;
+            case R.id.menuSyncLoginDefServer:
+                syncLoginDS(); return true;
+            case R.id.menuLogoutDefServer:
+                logoutDS(); return true;
+            case R.id.menuReqSessionInfoDefServer:
+                requestSessionInfoDS(); return true;
+            case R.id.menuSyncReqSessionInfoDefServer:
+                syncSessionInfoDS(); return true;
+            case R.id.menuJoinSessionDefServer:
+                joinSession(); return true;
+            case R.id.menuSyncJoinSessionDefServer:
+                printMessageln("Not supported yet!");
                 return true;
-            case R.id.menuLoginDS:
-                loginDS();
+            case R.id.menuLeaveSessionDefServer:
+                leaveSession(); return true;
+            case R.id.menuChangeGroupDefServer:
+                changeGroup(); return true;
+            case R.id.menuChat:
+                chat(); return true;
+            case R.id.menuMulticastChat:
+                printMessageln("Not supported yet in Android!");
+                return true;
+            case R.id.menuTestDummyEvent:
+                // from here
+            case R.id.menuTestUserEvent:
+            case R.id.menuTestDatagram:
+            case R.id.menuTestUserPos:
+            case R.id.menuSendRecv:
+            case R.id.menuCastRecv:
+            case R.id.menuAsyncSendRecv:
+            case R.id.menuAsyncCastRecv:
+            case R.id.menuShowGroupInfo:
+            case R.id.menuShowCurUserStat:
+            case R.id.menuShowCurChannels:
+            case R.id.menuInputThroughput:
+            case R.id.menuOutputThroughput:
+            case R.id.menuShowAllConfig:
+            case R.id.menuChangeConfig:
+            case R.id.menuAddChannel:
+            case R.id.menuRemoveChannel:
+            case R.id.menuTestBlockChannel:
+            case R.id.menuSetFilePath:
+            case R.id.menuReqFile:
+            case R.id.menuPushFile:
+            case R.id.menuCancelRecvFile:
+            case R.id.menuCancelSendFile:
+            case R.id.menuReqContentList:
+            case R.id.menuReqNextContentList:
+            case R.id.menuReqPrevContentList:
+            case R.id.menuReqAttachFile:
+            case R.id.menuUploadContent:
+            case R.id.menuRegNewUser:
+            case R.id.menuDeregUser:
+            case R.id.menuFindRegUser:
+            case R.id.menuAddNewFriend:
+            case R.id.menuRemoveFriend:
+            case R.id.menuShowFriends:
+            case R.id.menuShowFriendRequesters:
+            case R.id.menuShowBiFriends:
+            case R.id.menuTestForwardScheme:
+            case R.id.menuTestDelayForwardScheme:
+            case R.id.menuRepeatSNSRequest:
+            case R.id.menuPullPushMultipleFiles:
+            case R.id.menuSplitFile:
+            case R.id.menuMergeFiles:
+            case R.id.menuDistMergeFile:
+                printMessageln("Not supported yet!");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -577,6 +651,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     public void onServerInfoDialogCancelClick(DialogFragment dialog) {
         // User touched the dialog's cancel button
         // nothing to do yet!
+        printMessageln("cancel to start CM");
     }
 
     private void printAllMenus()
