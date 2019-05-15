@@ -33,15 +33,15 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/loginButton"
+            android:id="@+id/buttonLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:onClick="onClickLogin"
+            android:onClick="onConfirmLogin"
             android:text="@string/button_confirm" />
 
         <Button
-            android:id="@+id/cancelButton"
+            android:id="@+id/buttonCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

@@ -46,9 +46,8 @@ import kr.ac.konkuk.ccslab.cm.info.CMInfo;
 import kr.ac.konkuk.ccslab.cm.info.CMInteractionInfo;
 import kr.ac.konkuk.ccslab.cm.manager.CMConfigurator;
 import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
-import kr.ac.konkuk.ccslab.cm.util.CMUtil;
 
-public class MainActivity extends AppCompatActivity implements ServerInfoDialogFragment.ServerInfoDialogListener,
+public class MainActivity extends AppCompatActivity implements
         SyncLoginDSDialogFragment.SyncLoginDSDialogListener,
         JoinSessionDialogFragment.JoinSessionDialogListener,
         ChangeGroupDialogFragment.ChangeGroupDialogListener,
@@ -71,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
     private CMClientEventHandler m_cmEventHandler;
     private String m_strReceiver;
 
+    private Dialog m_serverInfoDialog;
     private Dialog m_loginDSDialog;
 
     public static final String EXTRA_MESSAGE = "com.example.mlim.CMClient.MESSAGE";
@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         setContentView(R.layout.activity_main);
 
         // initialize dialogs
+        m_serverInfoDialog = null;
         m_loginDSDialog = null;
 
         // initialize the cmTextView
@@ -607,24 +608,22 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
 
     public void showServerInfoDialog(String strAddress, int nPort)
     {
-        // Create an instance of the dialog fragment and show it
-        DialogFragment dialog = new ServerInfoDialogFragment();
-        Bundle args = new Bundle();
-        args.putString("serverAddress", strAddress);
-        args.putInt("serverPort", nPort);
-        dialog.setArguments(args);
+        m_serverInfoDialog = new Dialog(this);
+        m_serverInfoDialog.setContentView(R.layout.dialog_server_info);
+        m_serverInfoDialog.setTitle(R.string.server_info_title);
 
-        dialog.show(getFragmentManager(), "ServerInfoDialogFragment");
+        EditText addressEditText = m_serverInfoDialog.findViewById(R.id.serverAddressEditText);
+        EditText portEditText = m_serverInfoDialog.findViewById(R.id.serverPortEditText);
+        addressEditText.setText(strAddress);
+        portEditText.setText(String.valueOf(nPort));
+
+        m_serverInfoDialog.show();
     }
 
-    // The dialog fragment receives a reference to this Activity through the
-    // Fragment.onAttach() callback, which it uses to call the following methods
-    // defined by the NoticeDialogFragment.NoticeDialogListener interface
-    @Override
-    public void onServerInfoDialogConfirmClick(DialogFragment dialog) {
-        // User touched the dialog's confirm button
-        EditText addressEditText = dialog.getView().findViewById(R.id.serverAddressEditText);
-        EditText portEditText = dialog.getView().findViewById(R.id.serverPortEditText);
+    public void onConfirmServerInfo(View v)
+    {
+        EditText addressEditText = m_serverInfoDialog.findViewById(R.id.serverAddressEditText);
+        EditText portEditText = m_serverInfoDialog.findViewById(R.id.serverPortEditText);
         String strAddress = addressEditText.getText().toString().trim();
         int nPort = Integer.parseInt(portEditText.getText().toString().trim());
         Log.d("MainActivity : onServerInfoDialogConfirmClick()", "server input("+strAddress+", "+nPort+").");
@@ -645,13 +644,13 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
             printMessageln("Type \"0\" for menu.");
         }
 
+        m_serverInfoDialog.dismiss();
     }
 
-    @Override
-    public void onServerInfoDialogCancelClick(DialogFragment dialog) {
-        // User touched the dialog's cancel button
-        // nothing to do yet!
+    public void onCancelServerInfo(View v)
+    {
         printMessageln("cancel to start CM");
+        m_serverInfoDialog.dismiss();
     }
 
     private void printAllMenus()
@@ -753,15 +752,15 @@ public class MainActivity extends AppCompatActivity implements ServerInfoDialogF
         printMessage("====== login to default server\n");
         m_loginDSDialog = new Dialog(this);
         m_loginDSDialog.setContentView(R.layout.dialog_login_ds);
-        m_loginDSDialog.setTitle("Login to Default Server");
+        m_loginDSDialog.setTitle(R.string.login_ds_title);
 
-        Button loginButton = (Button) m_loginDSDialog.findViewById(R.id.loginButton);
-        Button cancelButton = (Button) m_loginDSDialog.findViewById(R.id.cancelButton);
+        Button loginButton = (Button) m_loginDSDialog.findViewById(R.id.buttonLogin);
+        Button cancelButton = (Button) m_loginDSDialog.findViewById(R.id.buttonCancel);
 
         m_loginDSDialog.show();
     }
 
-    public void onClickLogin(View v)
+    public void onConfirmLogin(View v)
     {
         EditText idEditText = m_loginDSDialog.findViewById(R.id.loginDSIDEditText);
         EditText passwdEditText = m_loginDSDialog.findViewById(R.id.loginDSPasswdEditText);
