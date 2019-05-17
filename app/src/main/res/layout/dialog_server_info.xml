@@ -40,7 +40,7 @@
             android:text="@string/button_confirm" />
 
         <Button
-            android:id="@+id/buttonCancel"
+            android:id="@+id/buttonCancelServerInfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

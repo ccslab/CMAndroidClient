@@ -55,13 +55,13 @@
         <menu >
             <item
                 android:id="@+id/menuReqSessionInfoDefServer"
-                android:title="@string/sync_req_session_info_default_server" />
+                android:title="@string/req_session_info_default_server" />
             <item
                 android:id="@+id/menuSyncReqSessionInfoDefServer"
                 android:title="@string/sync_req_session_info_default_server" />
             <item
                 android:id="@+id/menuJoinSessionDefServer"
-                android:title="@string/sync_join_session_default_server" />
+                android:title="@string/join_session_default_server" />
             <item
                 android:id="@+id/menuSyncJoinSessionDefServer"
                 android:title="@string/sync_join_session_default_server" />

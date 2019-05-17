@@ -17,4 +17,27 @@
         android:ems="10"
         android:hint="@string/session_name"
         android:inputType="textPersonName" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/buttonJoinSession"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onConfirmJoinSession"
+            android:text="@string/button_confirm" />
+
+        <Button
+            android:id="@+id/buttonCancelJoinSession"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onCancelJoinSession"
+            android:text="@string/button_cancel" />
+
+    </LinearLayout>
 </LinearLayout>

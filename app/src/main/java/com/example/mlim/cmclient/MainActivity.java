@@ -48,8 +48,6 @@ import kr.ac.konkuk.ccslab.cm.manager.CMConfigurator;
 import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 
 public class MainActivity extends AppCompatActivity implements
-        SyncLoginDSDialogFragment.SyncLoginDSDialogListener,
-        JoinSessionDialogFragment.JoinSessionDialogListener,
         ChangeGroupDialogFragment.ChangeGroupDialogListener,
         ChatDialogFragment.ChatDialogListener,
         AddChannelDialogFragment.AddChannelDialogListener,
@@ -72,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private Dialog m_serverInfoDialog;
     private Dialog m_loginDSDialog;
+    private Dialog m_joinSessionDialog;
 
     public static final String EXTRA_MESSAGE = "com.example.mlim.CMClient.MESSAGE";
     private static final int READ_REQUEST_CODE = 42;
@@ -85,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements
         // initialize dialogs
         m_serverInfoDialog = null;
         m_loginDSDialog = null;
+        m_joinSessionDialog = null;
 
         // initialize the cmTextView
         TextView cmTextView = (TextView) findViewById(R.id.cmTextView);
@@ -151,8 +151,7 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.menuJoinSessionDefServer:
                 joinSession(); return true;
             case R.id.menuSyncJoinSessionDefServer:
-                printMessageln("Not supported yet!");
-                return true;
+                syncJoinSession(); return true;
             case R.id.menuLeaveSessionDefServer:
                 leaveSession(); return true;
             case R.id.menuChangeGroupDefServer:
@@ -270,8 +269,7 @@ public class MainActivity extends AppCompatActivity implements
                 joinSession();
                 break;
             case "23": // synchronously join a session
-                printMessageln("Not supported yet!");
-                //syncJoinSession();
+                syncJoinSession();
                 break;
             case "24": // leave the current session
                 leaveSession();
@@ -754,9 +752,6 @@ public class MainActivity extends AppCompatActivity implements
         m_loginDSDialog.setContentView(R.layout.dialog_login_ds);
         m_loginDSDialog.setTitle(R.string.login_ds_title);
 
-        Button loginButton = (Button) m_loginDSDialog.findViewById(R.id.buttonLogin);
-        Button cancelButton = (Button) m_loginDSDialog.findViewById(R.id.buttonCancel);
-
         m_loginDSDialog.show();
     }
 
@@ -789,15 +784,34 @@ public class MainActivity extends AppCompatActivity implements
     private void syncLoginDS()
     {
         printMessage("====== synchronously login to default server\n");
-        // Create an instance of the dialog fragment and show it
-        DialogFragment dialog = new SyncLoginDSDialogFragment();
-        dialog.show(getFragmentManager(), "SyncLoginDSDialogFragment");
+        m_loginDSDialog = new Dialog(this);
+        m_loginDSDialog.setContentView(R.layout.dialog_login_ds);
+        m_loginDSDialog.setTitle(R.string.login_ds_title);
+
+        Button loginButton = (Button) m_loginDSDialog.findViewById(R.id.buttonLogin);
+        Button cancelButton = (Button) m_loginDSDialog.findViewById(R.id.buttonCancelLogin);
+
+        loginButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v)
+            {
+                confirmSyncLoginDS();
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v)
+            {
+                cancelSyncLoginDS();
+            }
+        });
+
+        m_loginDSDialog.show();
     }
 
-    public void onSyncLoginDSDialogConfirmClick(DialogFragment dialog)
+    private void confirmSyncLoginDS()
     {
-        EditText idEditText = dialog.getView().findViewById(R.id.loginDSIDEditText);
-        EditText passwdEditText = dialog.getView().findViewById(R.id.loginDSPasswdEditText);
+        EditText idEditText = m_loginDSDialog.findViewById(R.id.loginDSIDEditText);
+        EditText passwdEditText = m_loginDSDialog.findViewById(R.id.loginDSPasswdEditText);
         String strUserName = idEditText.getText().toString().trim();
         String strPasswd = passwdEditText.getText().toString();
         CMSessionEvent loginAckEvent = null;
@@ -835,11 +849,13 @@ public class MainActivity extends AppCompatActivity implements
             printMessage("failed the login request!\n");
         }
 
+        m_loginDSDialog.dismiss();
     }
 
-    public void onSyncLoginDSDialogCancelClick(DialogFragment dialog)
+    private void cancelSyncLoginDS()
     {
-        // nothing to do
+        printMessage("syncLogin canceled!\n");
+        m_loginDSDialog.dismiss();
     }
 
     //////////
@@ -915,15 +931,17 @@ public class MainActivity extends AppCompatActivity implements
     ////////// join session
     private void joinSession()
     {
-        DialogFragment dialog = new JoinSessionDialogFragment();
-        dialog.show(getFragmentManager(), "JoinSessionDialogFragment");
+        printMessage("====== join a session\n");
+        m_joinSessionDialog = new Dialog(this);
+        m_joinSessionDialog.setContentView(R.layout.dialog_join_session);
+        m_joinSessionDialog.setTitle(R.string.join_session_title);
+
+        m_joinSessionDialog.show();
     }
 
-    public void onJoinSessionDialogConfirmClick(DialogFragment dialog)
+    public void onConfirmJoinSession(View v)
     {
-        printMessage("====== join a session\n");
-
-        EditText sessionNameEditText = dialog.getView().findViewById(R.id.joinSessionNameEditText);
+        EditText sessionNameEditText = m_joinSessionDialog.findViewById(R.id.joinSessionNameEditText);
         String strSessionName = sessionNameEditText.getText().toString().trim();
         boolean bRequestResult = m_cmClientStub.joinSession(strSessionName);
 
@@ -936,11 +954,75 @@ public class MainActivity extends AppCompatActivity implements
             printMessage("failed the session-join request!\n");
         }
 
+        m_joinSessionDialog.dismiss();
     }
 
-    public void onJoinSessionDialogCancelClick(DialogFragment dialog)
+    public void onCancelJoinSession(View v)
     {
-        // nothing to do
+        printMessage("join-session canceled!\n");
+        m_joinSessionDialog.dismiss();
+    }
+
+    private void syncJoinSession()
+    {
+        printMessage("====== synchronously join a session\n");
+        m_joinSessionDialog = new Dialog(this);
+        m_joinSessionDialog.setContentView(R.layout.dialog_join_session);
+        m_joinSessionDialog.setTitle(R.string.join_session_title);
+
+        Button buttonConfirm = m_joinSessionDialog.findViewById(R.id.buttonJoinSession);
+        Button buttonCancel = m_joinSessionDialog.findViewById(R.id.buttonCancelJoinSession);
+
+        buttonConfirm.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v)
+            {
+                confirmSyncJoinSession();
+            }
+        });
+
+        buttonCancel.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v)
+            {
+                cancelSyncJoinSession();
+            }
+        });
+
+        m_joinSessionDialog.show();
+    }
+
+    private void confirmSyncJoinSession()
+    {
+        CMSessionEvent se = null;
+        EditText sessionNameEditText = m_joinSessionDialog.findViewById(R.id.joinSessionNameEditText);
+        String strSessionName = sessionNameEditText.getText().toString().trim();
+
+        if(!strSessionName.isEmpty())
+        {
+            m_cmEventHandler.setStartTime(System.currentTimeMillis());
+            se = m_cmClientStub.syncJoinSession(strSessionName);
+            long lDelay = System.currentTimeMillis() - m_cmEventHandler.getStartTime();
+            if(se != null)
+            {
+                // print result of the request
+                printMessage("successfully joined a session that has ("+se.getGroupNum()+") groups.\n");
+                printMessage("return delay: "+lDelay+" ms.\n");
+            }
+            else
+            {
+                printMessage("failed the session-join request!\n");
+            }
+        }
+        printMessage("======\n");
+
+        m_joinSessionDialog.dismiss();
+    }
+
+    private void cancelSyncJoinSession()
+    {
+        printMessage("sync-join-session canceled!\n");
+        m_joinSessionDialog.dismiss();
     }
     //////////
 
