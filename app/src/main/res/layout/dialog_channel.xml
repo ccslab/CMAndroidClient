@@ -32,7 +32,7 @@
             android:id="@+id/multicastChRadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clickable="false"
+            android:enabled="false"
             android:text="@string/multicast_channel" />
 
     </RadioGroup>
@@ -43,7 +43,7 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/buttonAddChannel"
+            android:id="@+id/buttonConfirmChannel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -51,7 +51,7 @@
             android:text="@string/button_confirm" />
 
         <Button
-            android:id="@+id/buttonCancelAddChannel"
+            android:id="@+id/buttonCancelChannel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

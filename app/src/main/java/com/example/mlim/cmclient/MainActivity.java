@@ -48,10 +48,6 @@ import kr.ac.konkuk.ccslab.cm.manager.CMConfigurator;
 import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 
 public class MainActivity extends AppCompatActivity implements
-        RemoveChannelDialogFragment.RemoveChannelDialogListener,
-        RemoveSocketChannelDialogFragment.RemoveSocketChannelDialogListener,
-        RemoveDatagramChannelDialogFragment.RemoveDatagramChannelDialogListener,
-        RemoveMulticastChannelDialogFragment.RemoveMulticastChannelDialogListener,
         RequestFileDialogFragment.RequestFileDialogListener,
         PushFileDialogFragment.PushFileDialogListener,
         MeasureInputThroughputDialogFragment.MeasureInputThroughputDialogListener,
@@ -1386,44 +1382,135 @@ public class MainActivity extends AppCompatActivity implements
     public void removeChannel()
     {
         printMessage("========== remove channel\n");
-        DialogFragment dialog = new RemoveChannelDialogFragment();
-        dialog.show(getFragmentManager(), "RemoveChannelDialogFragment");
+        m_removeChannelDialog = new Dialog(this);
+        m_removeChannelDialog.setContentView(R.layout.dialog_channel);
+        m_removeChannelDialog.setTitle(R.string.remove_channel);
+
+        Button confirmButton = m_removeChannelDialog.findViewById(R.id.buttonConfirmChannel);
+        Button cancelButton = m_removeChannelDialog.findViewById(R.id.buttonCancelChannel);
+
+        confirmButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v)
+            {
+                onConfirmRemoveChannel(v);
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v)
+            {
+                onCancelRemoveChannel(v);
+            }
+        });
+
+        m_removeChannelDialog.show();
     }
 
-    public void onRemoveChannelDialogConfirmClick(DialogFragment dialog)
+    public void onConfirmRemoveChannel(View v)
     {
-        RadioButton sockChRadioButton = dialog.getView().findViewById(R.id.sockChRadioButton);
-        RadioButton datagramChRadioButton = dialog.getView().findViewById(R.id.datagramChRadioButton);
-        RadioButton multicastChRadioButton = dialog.getView().findViewById(R.id.multicastChRadioButton);
+        RadioButton sockChRadioButton = m_removeChannelDialog.findViewById(R.id.sockChRadioButton);
+        RadioButton datagramChRadioButton = m_removeChannelDialog.findViewById(R.id.datagramChRadioButton);
+        RadioButton multicastChRadioButton = m_removeChannelDialog.findViewById(R.id.multicastChRadioButton);
 
         if(sockChRadioButton.isChecked())
         {
             printMessage("socket channel checked\n");
-            DialogFragment sockChDialog = new RemoveSocketChannelDialogFragment();
-            sockChDialog.show(getFragmentManager(), "RemoveSocketChannelDialogFragment");
+            m_removeSocketChannelDialog = new Dialog(this);
+            m_removeSocketChannelDialog.setContentView(R.layout.dialog_socket_channel);
+            m_removeSocketChannelDialog.setTitle(R.string.remove_socket_channel);
+
+            Button confirmRemoveSocketChannelButton = m_removeSocketChannelDialog.findViewById(R.id.buttonConfirmSocketChannel);
+            Button cancelRemoveSocketChannelButton = m_removeSocketChannelDialog.findViewById(R.id.buttonCancelSocketChannel);
+
+            confirmRemoveSocketChannelButton.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v)
+                {
+                    onConfirmRemoveSocketChannel(v);
+                }
+            });
+
+            cancelRemoveSocketChannelButton.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v)
+                {
+                    onCancelRemoveSocketChannel(v);
+                }
+            });
+
+            m_removeSocketChannelDialog.show();
         }
         else if(datagramChRadioButton.isChecked())
         {
             printMessage("datagram channel checked\n");
-            DialogFragment datagramChDialog = new RemoveDatagramChannelDialogFragment();
-            datagramChDialog.show(getFragmentManager(), "RemoveDatagramChannelDialogFragment");
+            m_removeDatagramChannelDialog = new Dialog(this);
+            m_removeDatagramChannelDialog.setContentView(R.layout.dialog_datagram_channel);
+            m_removeDatagramChannelDialog.setTitle(R.string.remove_datagram_channel);
+
+            Button confirmRemoveDatagramChannelButton = m_removeDatagramChannelDialog.findViewById(R.id.buttonConfirmDatagramChannel);
+            Button cancelRemoveDatagramChannelButton = m_removeDatagramChannelDialog.findViewById(R.id.buttonCancelDatagramChannel);
+
+            confirmRemoveDatagramChannelButton.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v)
+                {
+                    onConfirmRemoveDatagramChannel(v);
+                }
+            });
+
+            cancelRemoveDatagramChannelButton.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v)
+                {
+                    onCancelRemoveDatagramChannel(v);
+                }
+            });
+
+            m_removeDatagramChannelDialog.show();
         }
         else if(multicastChRadioButton.isChecked())
         {
             printMessage("multicast channel checked\n");
             printMessage("Android does not support NIO MULTICAST CHANNEL yet!!");
-            DialogFragment multicastChDialog = new RemoveMulticastChannelDialogFragment();
-            multicastChDialog.show(getFragmentManager(), "RemoveMulticastChannelDialogFragment");
+
+            m_removeMulticastChannelDialog = new Dialog(this);
+            m_removeMulticastChannelDialog.setContentView(R.layout.dialog_multicast_channel);
+            m_removeMulticastChannelDialog.setTitle(R.string.remove_multicast_channel);
+
+            Button confirmRemoveMulticastChannelButton = m_removeMulticastChannelDialog.findViewById(R.id.buttonConfirmMulticastChannel);
+            Button cancelRemoveMulticastChannelButton = m_removeMulticastChannelDialog.findViewById(R.id.buttonCancelMulticastChannel);
+
+            confirmRemoveMulticastChannelButton.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v)
+                {
+                    onConfirmRemoveMulticastChannel(v);
+                }
+            });
+
+            cancelRemoveMulticastChannelButton.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v)
+                {
+                    onCancelRemoveMulticastChannel(v);
+                }
+            });
+
+            m_removeMulticastChannelDialog.show();
         }
 
+        m_removeChannelDialog.dismiss();
     }
 
-    public void onRemoveChannelDialogCancelClick(DialogFragment dialog)
+    public void onCancelRemoveChannel(View v)
     {
-        // nothing to do
+        printMessage("remove-channel canceled!\n");
+        m_removeChannelDialog.dismiss();
     }
 
-    public void onRemoveSocketChannelDialogConfirmClick(DialogFragment dialog)
+    public void onConfirmRemoveSocketChannel(View v)
     {
         int nChKey = -1;
         String strServerName = null;
@@ -1432,7 +1519,7 @@ public class MainActivity extends AppCompatActivity implements
         SocketChannel sc = null;
         boolean result = false;
 
-        EditText chKeyEditText = dialog.getView().findViewById(R.id.chKeyEditText);
+        EditText chKeyEditText = m_removeSocketChannelDialog.findViewById(R.id.chKeyEditText);
         try {
             nChKey = Integer.parseInt(chKeyEditText.getText().toString().trim());
         }catch(NumberFormatException e){
@@ -1440,18 +1527,18 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
 
-        EditText serverNameEditText = dialog.getView().findViewById(R.id.serverNameEditText);
+        EditText serverNameEditText = m_removeSocketChannelDialog.findViewById(R.id.serverNameEditText);
         strServerName = serverNameEditText.getText().toString().trim();
         if(strServerName == null || strServerName.equals(""))
             strServerName = "SERVER"; // default server name
 
-        RadioButton blockRadioButton = dialog.getView().findViewById(R.id.blockChRadioButton);
-        RadioButton nonBlockRadioButton = dialog.getView().findViewById(R.id.nonBlockChRadioButton);
+        RadioButton blockRadioButton = m_removeSocketChannelDialog.findViewById(R.id.blockChRadioButton);
+        RadioButton nonBlockRadioButton = m_removeSocketChannelDialog.findViewById(R.id.nonBlockChRadioButton);
         if(blockRadioButton.isChecked()) isBlock = true;
         else if(nonBlockRadioButton.isChecked()) isBlock = false;
 
-        RadioButton syncCallRadioButton = dialog.getView().findViewById(R.id.syncCallRadioButton);
-        RadioButton asyncCallRadioButton = dialog.getView().findViewById(R.id.asyncCallRadioButton);
+        RadioButton syncCallRadioButton = m_removeSocketChannelDialog.findViewById(R.id.syncCallRadioButton);
+        RadioButton asyncCallRadioButton = m_removeSocketChannelDialog.findViewById(R.id.asyncCallRadioButton);
         if(syncCallRadioButton.isChecked()) isSyncCall = true;
         else if(asyncCallRadioButton.isChecked()) isSyncCall = false;
 
@@ -1500,26 +1587,28 @@ public class MainActivity extends AppCompatActivity implements
                         +"), server("+strServerName+")\n");
         }
 
+        m_removeSocketChannelDialog.dismiss();
     }
 
-    public void onRemoveSocketChannelDialogCancelClick(DialogFragment dialog)
+    public void onCancelRemoveSocketChannel(View v)
     {
-        // nothing to do
+        printMessage("remove-socket canceled!\n");
+        m_removeSocketChannelDialog.dismiss();
     }
 
-    public void onRemoveDatagramChannelDialogConfirmClick(DialogFragment dialog)
+    public void onConfirmRemoveDatagramChannel(View v)
     {
         int nChPort = -1;
         boolean isBlock = true;
         DatagramChannel dc = null;
         boolean result = false;
 
-        RadioButton blockChRadioButton = dialog.getView().findViewById(R.id.blockChRadioButton);
-        RadioButton nonBlockChRadioButton = dialog.getView().findViewById(R.id.nonBlockChRadioButton);
+        RadioButton blockChRadioButton = m_removeDatagramChannelDialog.findViewById(R.id.blockChRadioButton);
+        RadioButton nonBlockChRadioButton = m_removeDatagramChannelDialog.findViewById(R.id.nonBlockChRadioButton);
         if(blockChRadioButton.isChecked()) isBlock = true;
         else if(nonBlockChRadioButton.isChecked()) isBlock = false;
 
-        EditText portNumberEditText = dialog.getView().findViewById(R.id.portNumberEditText);
+        EditText portNumberEditText = m_removeDatagramChannelDialog.findViewById(R.id.portNumberEditText);
         try{
             nChPort = Integer.parseInt(portNumberEditText.getText().toString().trim());
         }catch(NumberFormatException e){
@@ -1543,14 +1632,17 @@ public class MainActivity extends AppCompatActivity implements
             else
                 printMessage("Failed to remove a non-blocking datagram socket channel: port("+nChPort+")\n");
         }
+
+        m_removeDatagramChannelDialog.dismiss();
     }
 
-    public void onRemoveDatagramChannelDialogCancelClick(DialogFragment dialog)
+    public void onCancelRemoveDatagramChannel(View v)
     {
-        // nothing to do
+        printMessage("remove-datagram-channel canceled!\n");
+        m_removeDatagramChannelDialog.dismiss();
     }
 
-    public void onRemoveMulticastChannelDialogConfirmClick(DialogFragment dialog)
+    public void onConfirmRemoveMulticastChannel(View v)
     {
         String strSessionName = null;
         String strGroupName = null;
@@ -1558,10 +1650,10 @@ public class MainActivity extends AppCompatActivity implements
         int nChPort = -1;
         boolean result = false;
 
-        EditText snameEditText = dialog.getView().findViewById(R.id.sessionNameEditText);
-        EditText gnameEditText = dialog.getView().findViewById(R.id.groupNameEditText);
-        EditText addrEditText = dialog.getView().findViewById(R.id.multicastAddrEditText);
-        EditText portEditText = dialog.getView().findViewById(R.id.multicastPortEditText);
+        EditText snameEditText = m_removeMulticastChannelDialog.findViewById(R.id.sessionNameEditText);
+        EditText gnameEditText = m_removeMulticastChannelDialog.findViewById(R.id.groupNameEditText);
+        EditText addrEditText = m_removeMulticastChannelDialog.findViewById(R.id.multicastAddrEditText);
+        EditText portEditText = m_removeMulticastChannelDialog.findViewById(R.id.multicastPortEditText);
 
         strSessionName = snameEditText.getText().toString().trim();
         strGroupName = gnameEditText.getText().toString().trim();
@@ -1585,11 +1677,13 @@ public class MainActivity extends AppCompatActivity implements
                     +strGroupName+"), address("+strChAddress+"), port("+nChPort+")\n");
         }
 
+        m_removeMulticastChannelDialog.dismiss();
     }
 
-    public void onRemoveMulticastChannelDialogCancelClick(DialogFragment dialog)
+    public void onCancelRemoveMulticastChannel(View v)
     {
-        // nothing to do
+        printMessage("remove-multicast-channel canceled!\n");
+        m_removeMulticastChannelDialog.dismiss();
     }
 
     //////////

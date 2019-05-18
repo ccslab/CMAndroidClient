@@ -8,7 +8,7 @@
         android:id="@+id/datagramChTitleTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/add_datagram_channel" />
+        android:text="@string/datagram_channel" />
 
     <RadioGroup
         android:id="@+id/datagramChRadioGroup"
@@ -50,7 +50,7 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/buttonAddDatagramChannel"
+            android:id="@+id/buttonConfirmDatagramChannel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -58,7 +58,7 @@
             android:text="@string/button_confirm" />
 
         <Button
-            android:id="@+id/buttonCancelAddDatagramChannel"
+            android:id="@+id/buttonCancelDatagramChannel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
