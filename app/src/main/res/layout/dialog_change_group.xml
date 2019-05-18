@@ -17,4 +17,26 @@
         android:ems="10"
         android:hint="@string/group_name"
         android:inputType="textPersonName" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/buttonChangeGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onConfirmChangeGroup"
+            android:text="@string/button_confirm" />
+
+        <Button
+            android:id="@+id/buttonCancelChangeGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onCancelChangeGroup"
+            android:text="@string/button_cancel" />
+    </LinearLayout>
 </LinearLayout>

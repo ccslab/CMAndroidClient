@@ -48,7 +48,6 @@ import kr.ac.konkuk.ccslab.cm.manager.CMConfigurator;
 import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 
 public class MainActivity extends AppCompatActivity implements
-        ChangeGroupDialogFragment.ChangeGroupDialogListener,
         ChatDialogFragment.ChatDialogListener,
         AddChannelDialogFragment.AddChannelDialogListener,
         AddSocketChannelDialogFragment.AddSocketChannelDialogListener,
@@ -71,6 +70,18 @@ public class MainActivity extends AppCompatActivity implements
     private Dialog m_serverInfoDialog;
     private Dialog m_loginDSDialog;
     private Dialog m_joinSessionDialog;
+    private Dialog m_changeGroupDialog;
+    private Dialog m_addChannelDialog;
+    private Dialog m_addDatagramChannelDialog;
+    private Dialog m_addMulticastChannelDialog;
+    private Dialog m_removeChannelDialog;
+    private Dialog m_removeSocketChannelDialog;
+    private Dialog m_removeDatagramChannelDialog;
+    private Dialog m_removeMulticastChannelDialog;
+    private Dialog m_requestFileDialog;
+    private Dialog m_pushFileDialog;
+    private Dialog m_measureInputThgoughputDialog;
+    private Dialog m_measureOutputThroughputDialog;
 
     public static final String EXTRA_MESSAGE = "com.example.mlim.CMClient.MESSAGE";
     private static final int READ_REQUEST_CODE = 42;
@@ -85,6 +96,18 @@ public class MainActivity extends AppCompatActivity implements
         m_serverInfoDialog = null;
         m_loginDSDialog = null;
         m_joinSessionDialog = null;
+        m_changeGroupDialog = null;
+        m_addChannelDialog = null;
+        m_addDatagramChannelDialog = null;
+        m_addMulticastChannelDialog = null;
+        m_removeChannelDialog = null;
+        m_removeSocketChannelDialog = null;
+        m_removeDatagramChannelDialog = null;
+        m_removeMulticastChannelDialog = null;
+        m_requestFileDialog = null;
+        m_pushFileDialog = null;
+        m_measureInputThgoughputDialog = null;
+        m_measureOutputThroughputDialog = null;
 
         // initialize the cmTextView
         TextView cmTextView = (TextView) findViewById(R.id.cmTextView);
@@ -1043,24 +1066,29 @@ public class MainActivity extends AppCompatActivity implements
     ////////// change group
     private void changeGroup()
     {
-        DialogFragment dialog = new ChangeGroupDialogFragment();
-        dialog.show(getFragmentManager(), "ChangeGroupDialogFragment");
+        printMessage("====== change group\n");
+        m_changeGroupDialog = new Dialog(this);
+        m_changeGroupDialog.setContentView(R.layout.dialog_change_group);
+        m_changeGroupDialog.setTitle(R.string.change_group_title);
+
+        m_changeGroupDialog.show();
     }
 
-    public void onChangeGroupDialogConfirmClick(DialogFragment dialog)
+    public void onConfirmChangeGroup(View v)
     {
-        printMessage("====== change group\n");
-        EditText changeGroupNameEditText = dialog.getView().findViewById(R.id.changeGroupNameEditText);
+        EditText changeGroupNameEditText = m_changeGroupDialog.findViewById(R.id.changeGroupNameEditText);
         String strGroupName = changeGroupNameEditText.getText().toString().trim();
 
-        if(strGroupName != null)
+        if(!strGroupName.isEmpty())
             m_cmClientStub.changeGroup(strGroupName);
 
+        m_changeGroupDialog.dismiss();
     }
 
-    public void onChangeGroupDialogCancelClick(DialogFragment dialog)
+    public void onCancelChangeGroup(View v)
     {
-        // nothing to do
+        printMessage("change-group canceled!");
+        m_changeGroupDialog.dismiss();
     }
     //////////
 
