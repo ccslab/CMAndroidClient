@@ -48,11 +48,6 @@ import kr.ac.konkuk.ccslab.cm.manager.CMConfigurator;
 import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 
 public class MainActivity extends AppCompatActivity implements
-        ChatDialogFragment.ChatDialogListener,
-        AddChannelDialogFragment.AddChannelDialogListener,
-        AddSocketChannelDialogFragment.AddSocketChannelDialogListener,
-        AddDatagramChannelDialogFragment.AddDatagramChannelDialogListener,
-        AddMulticastChannelDialogFragment.AddMulticastChannelDialogListener,
         RemoveChannelDialogFragment.RemoveChannelDialogListener,
         RemoveSocketChannelDialogFragment.RemoveSocketChannelDialogListener,
         RemoveDatagramChannelDialogFragment.RemoveDatagramChannelDialogListener,
@@ -71,7 +66,9 @@ public class MainActivity extends AppCompatActivity implements
     private Dialog m_loginDSDialog;
     private Dialog m_joinSessionDialog;
     private Dialog m_changeGroupDialog;
+    private Dialog m_chatDialog;
     private Dialog m_addChannelDialog;
+    private Dialog m_addSocketChannelDialog;
     private Dialog m_addDatagramChannelDialog;
     private Dialog m_addMulticastChannelDialog;
     private Dialog m_removeChannelDialog;
@@ -97,7 +94,9 @@ public class MainActivity extends AppCompatActivity implements
         m_loginDSDialog = null;
         m_joinSessionDialog = null;
         m_changeGroupDialog = null;
+        m_chatDialog = null;
         m_addChannelDialog = null;
+        m_addSocketChannelDialog = null;
         m_addDatagramChannelDialog = null;
         m_addMulticastChannelDialog = null;
         m_removeChannelDialog = null;
@@ -185,7 +184,6 @@ public class MainActivity extends AppCompatActivity implements
                 printMessageln("Not supported yet in Android!");
                 return true;
             case R.id.menuTestDummyEvent:
-                // from here
             case R.id.menuTestUserEvent:
             case R.id.menuTestDatagram:
             case R.id.menuTestUserPos:
@@ -200,8 +198,12 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.menuOutputThroughput:
             case R.id.menuShowAllConfig:
             case R.id.menuChangeConfig:
+                printMessageln("Not supported yet!");
+                return true;
             case R.id.menuAddChannel:
+                addChannel(); return true;
             case R.id.menuRemoveChannel:
+                removeChannel(); return true;
             case R.id.menuTestBlockChannel:
             case R.id.menuSetFilePath:
             case R.id.menuReqFile:
@@ -1095,25 +1097,31 @@ public class MainActivity extends AppCompatActivity implements
     ////////// chat
     private void chat()
     {
-        DialogFragment dialog = new ChatDialogFragment();
-        dialog.show(getFragmentManager(), "ChatDialogFragment");
+        printMessage("====== chat\n");
+
+        m_chatDialog = new Dialog(this);
+        m_chatDialog.setContentView(R.layout.dialog_chat);
+        m_chatDialog.setTitle(R.string.chat_title);
+
+        m_chatDialog.show();
+
     }
 
-    public void onChatDialogConfirmClick(DialogFragment dialog)
+    public void onConfirmChat(View v)
     {
-        printMessage("====== chat\n");
-        EditText targetEditText = dialog.getView().findViewById(R.id.chatTargetEditText);
+        EditText targetEditText = m_chatDialog.findViewById(R.id.chatTargetEditText);
         String strTarget = targetEditText.getText().toString().trim();
-        EditText messageEditText = dialog.getView().findViewById(R.id.chatMessageEditText);
+        EditText messageEditText = m_chatDialog.findViewById(R.id.chatMessageEditText);
         String strMessage = messageEditText.getText().toString().trim();
 
         m_cmClientStub.chat(strTarget, strMessage);
-
+        m_chatDialog.dismiss();
     }
 
-    public void onChatDialogCancelClick(DialogFragment dialog)
+    public void onCancelChat(View v)
     {
-        // nothing to do
+        printMessage("chat canceled!\n");
+        m_chatDialog.dismiss();
     }
     //////////
 
@@ -1121,43 +1129,55 @@ public class MainActivity extends AppCompatActivity implements
     private void addChannel()
     {
         printMessage("========== add channel\n");
-        DialogFragment dialog = new AddChannelDialogFragment();
-        dialog.show(getFragmentManager(), "AddChannelDialogFragment");
+        m_addChannelDialog = new Dialog(this);
+        m_addChannelDialog.setContentView(R.layout.dialog_channel);
+        m_addChannelDialog.setTitle(R.string.add_channel);
+
+        m_addChannelDialog.show();
     }
 
-    public void onAddChannelDialogConfirmClick(DialogFragment dialog)
+    public void onConfirmAddChannel(View v)
     {
-        RadioButton sockChRadioButton = dialog.getView().findViewById(R.id.sockChRadioButton);
-        RadioButton datagramChRadioButton = dialog.getView().findViewById(R.id.datagramChRadioButton);
-        RadioButton multicastChRadioButton = dialog.getView().findViewById(R.id.multicastChRadioButton);
+        RadioButton sockChRadioButton = m_addChannelDialog.findViewById(R.id.sockChRadioButton);
+        RadioButton datagramChRadioButton = m_addChannelDialog.findViewById(R.id.datagramChRadioButton);
+        RadioButton multicastChRadioButton = m_addChannelDialog.findViewById(R.id.multicastChRadioButton);
 
         if(sockChRadioButton.isChecked())
         {
             printMessage("socket channel checked\n");
-            DialogFragment sockChDialog = new AddSocketChannelDialogFragment();
-            sockChDialog.show(getFragmentManager(), "AddSocketChannelDialogFragment");
+            m_addSocketChannelDialog = new Dialog(this);
+            m_addSocketChannelDialog.setContentView(R.layout.dialog_socket_channel);
+            m_addSocketChannelDialog.setTitle(R.string.add_socket_channel);
+            m_addSocketChannelDialog.show();
         }
         else if(datagramChRadioButton.isChecked())
         {
             printMessage("datagram channel checked\n");
-            DialogFragment datagramChDialog = new AddDatagramChannelDialogFragment();
-            datagramChDialog.show(getFragmentManager(), "AddDatagramChannelDialogFragment");
+            m_addDatagramChannelDialog = new Dialog(this);
+            m_addDatagramChannelDialog.setContentView(R.layout.dialog_datagram_channel);
+            m_addDatagramChannelDialog.setTitle(R.string.add_datagram_channel);
+            m_addDatagramChannelDialog.show();
         }
         else if(multicastChRadioButton.isChecked())
         {
             printMessage("multicast channel checked\n");
             printMessage("Android does not support NIO MULTICAST CHANNEL yet!!");
-            DialogFragment multicastChDialog = new AddMulticastChannelDialogFragment();
-            multicastChDialog.show(getFragmentManager(), "AddMulticastChannelDialogFragment");
+            m_addMulticastChannelDialog = new Dialog(this);
+            m_addMulticastChannelDialog.setContentView(R.layout.dialog_multicast_channel);
+            m_addMulticastChannelDialog.setTitle(R.string.add_multicast_channel);
+            m_addMulticastChannelDialog.show();
         }
+
+        m_addChannelDialog.dismiss();
     }
 
-    public void onAddChannelDialogCancelClick(DialogFragment dialog)
+    public void onCancelAddChannel(View v)
     {
-        // nothing to do
+        printMessage("add-channel canceled!\n");
+        m_addChannelDialog.dismiss();
     }
 
-    public void onAddSocketChannelDialogConfirmClick(DialogFragment dialog)
+    public void onConfirmAddSocketChannel(View v)
     {
         int nChKey = -1;
         String strServerName = null;
@@ -1166,7 +1186,7 @@ public class MainActivity extends AppCompatActivity implements
         SocketChannel sc = null;
         boolean result = false;
 
-        EditText chKeyEditText = dialog.getView().findViewById(R.id.chKeyEditText);
+        EditText chKeyEditText = m_addSocketChannelDialog.findViewById(R.id.chKeyEditText);
         try {
             nChKey = Integer.parseInt(chKeyEditText.getText().toString().trim());
         }catch(NumberFormatException e){
@@ -1174,18 +1194,18 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
 
-        EditText serverNameEditText = dialog.getView().findViewById(R.id.serverNameEditText);
+        EditText serverNameEditText = m_addSocketChannelDialog.findViewById(R.id.serverNameEditText);
         strServerName = serverNameEditText.getText().toString().trim();
         if(strServerName == null || strServerName.equals(""))
             strServerName = "SERVER"; // default server name
 
-        RadioButton blockRadioButton = dialog.getView().findViewById(R.id.blockChRadioButton);
-        RadioButton nonBlockRadioButton = dialog.getView().findViewById(R.id.nonBlockChRadioButton);
+        RadioButton blockRadioButton = m_addSocketChannelDialog.findViewById(R.id.blockChRadioButton);
+        RadioButton nonBlockRadioButton = m_addSocketChannelDialog.findViewById(R.id.nonBlockChRadioButton);
         if(blockRadioButton.isChecked()) isBlock = true;
         else if(nonBlockRadioButton.isChecked()) isBlock = false;
 
-        RadioButton syncCallRadioButton = dialog.getView().findViewById(R.id.syncCallRadioButton);
-        RadioButton asyncCallRadioButton = dialog.getView().findViewById(R.id.asyncCallRadioButton);
+        RadioButton syncCallRadioButton = m_addSocketChannelDialog.findViewById(R.id.syncCallRadioButton);
+        RadioButton asyncCallRadioButton = m_addSocketChannelDialog.findViewById(R.id.asyncCallRadioButton);
         if(syncCallRadioButton.isChecked()) isSyncCall = true;
         else if(asyncCallRadioButton.isChecked()) isSyncCall = false;
 
@@ -1261,25 +1281,27 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
 
+        m_addSocketChannelDialog.dismiss();
     }
 
-    public void onAddSocketChannelDialogCancelClick(DialogFragment dialog)
+    public void onCancelAddSocketChannel(View v)
     {
-        // nothing to do
+        printMessage("add-socket-channel canceled!\n");
+        m_addSocketChannelDialog.dismiss();
     }
 
-    public void onAddDatagramChannelDialogConfirmClick(DialogFragment dialog)
+    public void onConfirmAddDatagramChannel(View v)
     {
         int nChPort = -1;
         boolean isBlock = true;
         DatagramChannel dc = null;
 
-        RadioButton blockChRadioButton = dialog.getView().findViewById(R.id.blockChRadioButton);
-        RadioButton nonBlockChRadioButton = dialog.getView().findViewById(R.id.nonBlockChRadioButton);
+        RadioButton blockChRadioButton = m_addDatagramChannelDialog.findViewById(R.id.blockChRadioButton);
+        RadioButton nonBlockChRadioButton = m_addDatagramChannelDialog.findViewById(R.id.nonBlockChRadioButton);
         if(blockChRadioButton.isChecked()) isBlock = true;
         else if(nonBlockChRadioButton.isChecked()) isBlock = false;
 
-        EditText portNumberEditText = dialog.getView().findViewById(R.id.portNumberEditText);
+        EditText portNumberEditText = m_addDatagramChannelDialog.findViewById(R.id.portNumberEditText);
         try{
             nChPort = Integer.parseInt(portNumberEditText.getText().toString().trim());
         }catch(NumberFormatException e){
@@ -1304,14 +1326,16 @@ public class MainActivity extends AppCompatActivity implements
                 printMessage("Failed to add a non-blocking datagram socket channel: port("+nChPort+")\n");
         }
 
+        m_addDatagramChannelDialog.dismiss();
     }
 
-    public void onAddDatagramChannelDialogCancelClick(DialogFragment dialog)
+    public void onCancelAddDatagramChannel(View v)
     {
-        // nothing to do
+        printMessage("add-datagram-channel canceled!\n");
+        m_addDatagramChannelDialog.dismiss();
     }
 
-    public void onAddMulticastChannelDialogConfirmClick(DialogFragment dialog)
+    public void onConfirmAddMulticastChannel(View v)
     {
         String strSessionName = null;
         String strGroupName = null;
@@ -1319,10 +1343,10 @@ public class MainActivity extends AppCompatActivity implements
         int nChPort = -1;
         boolean result = false;
 
-        EditText snameEditText = dialog.getView().findViewById(R.id.sessionNameEditText);
-        EditText gnameEditText = dialog.getView().findViewById(R.id.groupNameEditText);
-        EditText addrEditText = dialog.getView().findViewById(R.id.multicastAddrEditText);
-        EditText portEditText = dialog.getView().findViewById(R.id.multicastPortEditText);
+        EditText snameEditText = m_addMulticastChannelDialog.findViewById(R.id.sessionNameEditText);
+        EditText gnameEditText = m_addMulticastChannelDialog.findViewById(R.id.groupNameEditText);
+        EditText addrEditText = m_addMulticastChannelDialog.findViewById(R.id.multicastAddrEditText);
+        EditText portEditText = m_addMulticastChannelDialog.findViewById(R.id.multicastPortEditText);
 
         strSessionName = snameEditText.getText().toString().trim();
         strGroupName = gnameEditText.getText().toString().trim();
@@ -1346,11 +1370,13 @@ public class MainActivity extends AppCompatActivity implements
                     +strGroupName+"), address("+strChAddress+"), port("+nChPort+")\n");
         }
 
+        m_addMulticastChannelDialog.dismiss();
     }
 
-    public void onAddMulticastChannelDialogCancelClick(DialogFragment dialog)
+    public void onCancelAddMulticastChannel(View v)
     {
-        // nothing to do
+        printMessage("add-multicast-channel canceled!\n");
+        m_addMulticastChannelDialog.dismiss();
     }
 
     //////////
