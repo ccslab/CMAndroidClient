@@ -47,11 +47,7 @@ import kr.ac.konkuk.ccslab.cm.info.CMInteractionInfo;
 import kr.ac.konkuk.ccslab.cm.manager.CMConfigurator;
 import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 
-public class MainActivity extends AppCompatActivity implements
-        RequestFileDialogFragment.RequestFileDialogListener,
-        PushFileDialogFragment.PushFileDialogListener,
-        MeasureInputThroughputDialogFragment.MeasureInputThroughputDialogListener,
-        MeasureOutputThroughputDialogFragment.MeasureOutputThroughputDialogListener
+public class MainActivity extends AppCompatActivity
 {
 
     private CMClientStub m_cmClientStub;
@@ -191,7 +187,9 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.menuShowCurUserStat:
             case R.id.menuShowCurChannels:
             case R.id.menuInputThroughput:
+                measureInputThroughput(); return true;
             case R.id.menuOutputThroughput:
+                measureOutputThroughput(); return true;
             case R.id.menuShowAllConfig:
             case R.id.menuChangeConfig:
                 printMessageln("Not supported yet!");
@@ -202,8 +200,12 @@ public class MainActivity extends AppCompatActivity implements
                 removeChannel(); return true;
             case R.id.menuTestBlockChannel:
             case R.id.menuSetFilePath:
+                printMessageln("Not supported yet!");
+                return true;
             case R.id.menuReqFile:
+                requestFile(); return true;
             case R.id.menuPushFile:
+                pushFile(); return true;
             case R.id.menuCancelRecvFile:
             case R.id.menuCancelSendFile:
             case R.id.menuReqContentList:
@@ -1779,24 +1781,27 @@ public class MainActivity extends AppCompatActivity implements
     public void requestFile()
     {
         printMessage("========== request file\n");
-        DialogFragment dialog = new RequestFileDialogFragment();
-        dialog.show(getFragmentManager(), "RequestFileDialogFragment");
+        m_requestFileDialog = new Dialog(this);
+        m_requestFileDialog.setContentView(R.layout.dialog_request_file);
+        m_requestFileDialog.setTitle(R.string.req_file);
+
+        m_requestFileDialog.show();
     }
 
-    public void onRequestFileDialogConfirmClick(DialogFragment dialog)
+    public void onConfirmRequestFile(View v)
     {
         boolean bReturn = false;
         String strFileName = null;
         String strFileOwner = null;
         String strFileAppendMode = null;
 
-        EditText fileNameEditText = dialog.getView().findViewById(R.id.fileNameEditText);
+        EditText fileNameEditText = m_requestFileDialog.findViewById(R.id.fileNameEditText);
         strFileName = fileNameEditText.getText().toString().trim();
-        EditText fileOwnerEditText = dialog.getView().findViewById(R.id.fileOwnerEditText);
+        EditText fileOwnerEditText = m_requestFileDialog.findViewById(R.id.fileOwnerEditText);
         strFileOwner = fileOwnerEditText.getText().toString().trim();
-        RadioButton defaultRadioButton = dialog.getView().findViewById(R.id.defaultRadioButton);
-        RadioButton overwriteRadioButton = dialog.getView().findViewById(R.id.overwriteRadioButton);
-        RadioButton appendRadioButton = dialog.getView().findViewById(R.id.appendRadioButton);
+        RadioButton defaultRadioButton = m_requestFileDialog.findViewById(R.id.defaultRadioButton);
+        RadioButton overwriteRadioButton = m_requestFileDialog.findViewById(R.id.overwriteRadioButton);
+        RadioButton appendRadioButton = m_requestFileDialog.findViewById(R.id.appendRadioButton);
         if(defaultRadioButton.isChecked())
             strFileAppendMode = "Default";
         else if(overwriteRadioButton.isChecked())
@@ -1816,11 +1821,13 @@ public class MainActivity extends AppCompatActivity implements
         if(!bReturn)
             printMessage("Request file error! file("+strFileName+"), owner("+strFileOwner+").\n");
 
+        m_requestFileDialog.dismiss();
     }
 
-    public void onRequestFileDialogCancelClick(DialogFragment dialog)
+    public void onCancelRequestFile(View v)
     {
-        // nothing to do
+        printMessage("request-file canceled!\n");
+        m_requestFileDialog.dismiss();
     }
     //////////
 
@@ -1829,17 +1836,22 @@ public class MainActivity extends AppCompatActivity implements
     public void pushFile()
     {
         printMessage("========== push file\n");
-        DialogFragment dialog = new PushFileDialogFragment();
-        dialog.show(getFragmentManager(), "PushFileDialogFragment");
+        m_pushFileDialog = new Dialog(this);
+        m_pushFileDialog.setContentView(R.layout.dialog_push_file);
+        m_pushFileDialog.setTitle(R.string.push_file);
+
+        m_pushFileDialog.show();
     }
 
-    public void onPushFileDialogConfirmClick(DialogFragment dialog)
+    public void onConfirmPushFile(View v)
     {
-        EditText recvEditText = dialog.getView().findViewById(R.id.fileReceiverEditText);
+        EditText recvEditText = m_pushFileDialog.findViewById(R.id.fileReceiverEditText);
         m_strReceiver = recvEditText.getText().toString().trim();
 
         // file selection with Storage Access Framework(SAF) since Android 4.4(API level 19)
         performFileSearch();
+
+        m_pushFileDialog.dismiss();
     }
 
     /**
@@ -1901,9 +1913,10 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public void onPushFileDialogCancelClick(DialogFragment dialog)
+    public void onCancelPushFile(View v)
     {
-        // nothing to do
+        printMessage("push-file canceled!\n");
+        m_pushFileDialog.dismiss();
     }
 
     //////////
@@ -1913,16 +1926,19 @@ public class MainActivity extends AppCompatActivity implements
     public void measureInputThroughput()
     {
         printMessage("========== measure input network throughput\n");
-        DialogFragment dialog = new MeasureInputThroughputDialogFragment();
-        dialog.show(getFragmentManager(), "MeasureInputThroughputDialogFragment");
+        m_measureInputThgoughputDialog = new Dialog(this);
+        m_measureInputThgoughputDialog.setContentView(R.layout.dialog_target_node);
+        m_measureInputThgoughputDialog.setTitle(R.string.measure_input_throughput);
+
+        m_measureInputThgoughputDialog.show();
     }
 
-    public void onMeasureInputThroughputDialogConfirmClick(DialogFragment dialog)
+    public void onConfirmMeasureInputThroughput(View v)
     {
         String strTarget = null;
         float fSpeed = -1;
 
-        EditText targetEditText = dialog.getView().findViewById(R.id.targetNodeEditText);
+        EditText targetEditText = m_measureInputThgoughputDialog.findViewById(R.id.targetNodeEditText);
         strTarget = targetEditText.getText().toString().trim();
 
         if(strTarget == null)
@@ -1936,26 +1952,50 @@ public class MainActivity extends AppCompatActivity implements
         else
             printMessage(String.format("Input network throughput from [%s] : %.2f MBps%n", strTarget, fSpeed));
 
+        m_measureInputThgoughputDialog.dismiss();
     }
 
-    public void onMeasureInputThroughputDialogCancelClick(DialogFragment dialog)
+    public void onCancelMeasureInputThroughput(View v)
     {
-        // nothing to do
+        printMessage("measure-input-network-throughput canceled!\n");
+        m_measureInputThgoughputDialog.dismiss();
     }
 
     public void measureOutputThroughput()
     {
         printMessage("========== measure output network throughput\n");
-        DialogFragment dialog = new MeasureOutputThroughputDialogFragment();
-        dialog.show(getFragmentManager(), "MeasureOutputThroughputDialogFragment");
+        m_measureOutputThroughputDialog = new Dialog(this);
+        m_measureOutputThroughputDialog.setContentView(R.layout.dialog_target_node);
+        m_measureOutputThroughputDialog.setTitle(R.string.measure_output_throughput);
+
+        Button buttonConfirm = m_measureOutputThroughputDialog.findViewById(R.id.buttonMeasureThroughput);
+        Button buttonCancel = m_measureOutputThroughputDialog.findViewById(R.id.buttonCancelMeasureThroughput);
+
+        buttonConfirm.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v)
+            {
+                onConfirmMeasureOutputThroughput(v);
+            }
+        });
+
+        buttonCancel.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v)
+            {
+                onCancelMeasureOutputThroughput(v);
+            }
+        });
+
+        m_measureOutputThroughputDialog.show();
     }
 
-    public void onMeasureOutputThroughputDialogConfirmClick(DialogFragment dialog)
+    public void onConfirmMeasureOutputThroughput(View v)
     {
         String strTarget = null;
         float fSpeed = -1;
 
-        EditText targetEditText = dialog.getView().findViewById(R.id.targetNodeEditText);
+        EditText targetEditText = m_measureOutputThroughputDialog.findViewById(R.id.targetNodeEditText);
         strTarget = targetEditText.getText().toString().trim();
 
         if(strTarget == null)
@@ -1969,11 +2009,13 @@ public class MainActivity extends AppCompatActivity implements
         else
             printMessage(String.format("Output network throughput to [%s] : %.2f MBps%n", strTarget, fSpeed));
 
+        m_measureOutputThroughputDialog.dismiss();
     }
 
-    public void onMeasureOutputThroughputDialogCancelClick(DialogFragment dialog)
+    public void onCancelMeasureOutputThroughput(View v)
     {
-        // nothing to do
+        printMessage("measure-output-network-throughput canceled!\n");
+        m_measureOutputThroughputDialog.dismiss();
     }
     //////////
 }
